@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import axios from "axios";
+import CustomButton from "../CustomButton/CustomButton";
+import { useNavigation } from "@react-navigation/native";
+import { Dimensions } from "react-native";
 
 function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
+
+  const windowHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -52,7 +66,25 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   );
 
   if (!fromSchedule || !toSchedule) {
-    return <Text>No schedule available for the selected route.</Text>;
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            height: windowHeight * 1,
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text>There is no such a route.</Text>
+        </View>
+      </View>
+    );
   }
 
   const fromTime = fromSchedule.departureTime;
@@ -94,7 +126,6 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
           <View style={styles.downsub}>
             <Text style={styles.smallText}>To</Text>
             <Text style={styles.midText}>{toStop}</Text>
-
             <Text style={styles.midText}>{toTime}</Text>
           </View>
         </View>
@@ -105,13 +136,49 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             <Text style={styles.smallText}>Got Off at:</Text>
             <Text style={styles.midText}>08.00</Text>
           </View>
-
+          <View>
+            <CustomButton
+              type="white"
+              text="Dropping Points"
+              onPress={() => setModalVisible(true)}
+            />
+            <CustomButton
+              type="white"
+              text="Reviews & Ratings"
+              onPress={() => navigation.navigate("ReviewsRatings")}
+            />
+          </View>
           <View style={styles.reddown}>
             <Text style={styles.smallText}>Delay:</Text>
             <Text style={styles.midText}>10 min</Text>
           </View>
         </View>
       </View>
+
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Dropping Points</Text>
+            <ScrollView>
+              {filteredSchedules.map((schedule, index) => (
+                <View key={index} style={styles.scheduleItem}>
+                  <Text style={styles.scheduleText}>
+                    {index === 0
+                      ? `${schedule.busStop.name} - Departure: ${schedule.departureTime}`
+                      : `${schedule.busStop.name} - Arrival: ${schedule.arrivalTime}`}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -191,5 +258,42 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  scheduleItem: {
+    padding: 10,
+    borderBottomColor: "#ddd",
+    borderBottomWidth: 1,
+  },
+  scheduleText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#1E2772",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
 });
+
 export default BusTime;

@@ -5,13 +5,13 @@ import {
   StyleSheet,
   useWindowDimensions,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import logo from "../../../assets/images/logo.png";
-import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
-import PickerStops from "@/src/components/PickerStops/Index";
+import PickerStops from "../../components/PickerStops/Index";
 import DatePic from "../../components/DatePic/Index";
 import axios from "axios";
 
@@ -31,8 +31,11 @@ const BusShedScreen = () => {
   const onSearchPressed = async () => {
     if (!from || !to || !date) {
       setError("Please fill all the fields");
+      Alert.alert("Missing Fields", "Please fill all the fields.");
       return;
     }
+
+    setError(null);
     console.log(
       "from",
       from,
@@ -46,37 +49,32 @@ const BusShedScreen = () => {
     const direction = calculateDirection(fromOrderIndex, toOrderIndex);
     setDirection(direction);
     console.log("from", from, "to", to, "direction", direction, "date", date);
-    // Add a small delay to ensure states are updated
-    setTimeout(async () => {
-      try {
-        console.log("HAPPENINGGG");
-        const response = await axios.get(
-          "http://192.168.8.102:8080/bus/search",
-          {
-            params: {
-              from,
-              to,
-              direction,
-              date,
-            },
-          }
-        );
-        setBusSchedules(response.data);
-        console.log("response data is ", response.data);
-        navigation.navigate("BusTimeTable", {
-          busSchedules: response.data,
-          direction,
+    setLoading(true);
+
+    try {
+      const response = await axios.get("http://192.168.8.102:8080/bus/search", {
+        params: {
           from,
           to,
+          direction,
           date,
-        });
-      } catch (error) {
-        setError("Error fetching bus schedules. Please try again later.");
-        console.error("Error fetching bus schedules:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    }, 100); // 100ms delay
+        },
+      });
+      setBusSchedules(response.data);
+      console.log("response data is ", response.data);
+      navigation.navigate("BusTimeTable", {
+        busSchedules: response.data,
+        direction,
+        from,
+        to,
+        date,
+      });
+    } catch (error) {
+      setError("Error fetching bus schedules. Please try again later.");
+      console.error("Error fetching bus schedules:", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateDirection = (fromOrderIndex, toOrderIndex) => {
@@ -94,6 +92,7 @@ const BusShedScreen = () => {
       </View>
       <View style={styles.sec}>
         <Text style={styles.text}>Search Your Destination</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
         <PickerStops
           placeholder="From"
           onSelect={(value, orderIndex) => {
@@ -120,7 +119,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  al: { alignItems: "center" },
+  al: {
+    alignItems: "center",
+  },
   logo: {
     width: "70%",
     maxWidth: 500,
@@ -139,6 +140,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     padding: 10,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
 
