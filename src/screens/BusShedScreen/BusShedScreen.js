@@ -13,15 +13,74 @@ import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
 import Picker from "@/src/components/Picker/Index";
 import DatePic from "../../components/DatePic/Index";
+import axios from "axios";
 
 const BusShedScreen = () => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
-  
+  const [from, setFrom] = useState(null);
+  const [fromOrderIndex, setFromOrderIndex] = useState(null);
+  const [to, setTo] = useState(null);
+  const [toOrderIndex, setToOrderIndex] = useState(null);
+  const [date, setDate] = useState(null);
+  const [direction, setDirection] = useState(null);
+  const [busSchedules, setBusSchedules] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const onSearchPressed = () => {
-    console.warn("Search");
-    navigation.navigate('BusTimeTable');
+  const onSearchPressed = async () => {
+    if (!from || !to || !date) {
+      setError("Please fill all the fields");
+      return;
+    }
+    console.log(
+      "from",
+      from,
+      "order index",
+      fromOrderIndex,
+      "to",
+      to,
+      "order index",
+      toOrderIndex
+    );
+    const direction = calculateDirection(fromOrderIndex, toOrderIndex);
+    setDirection(direction);
+    console.log("from", from, "to", to, "direction", direction, "date", date);
+    // Add a small delay to ensure states are updated
+    setTimeout(async () => {
+      try {
+        console.log("HAPPENINGGG");
+        const response = await axios.get(
+          "http://192.168.8.102:8080/bus/search",
+          {
+            params: {
+              from,
+              to,
+              direction,
+              date,
+            },
+          }
+        );
+        setBusSchedules(response.data);
+        console.log("response data is ", response.data);
+        navigation.navigate("BusTimeTable", {
+          busSchedules: response.data,
+          direction,
+          from,
+          to,
+          date,
+        });
+      } catch (error) {
+        setError("Error fetching bus schedules. Please try again later.");
+        console.error("Error fetching bus schedules:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    }, 100); // 100ms delay
+  };
+
+  const calculateDirection = (fromOrderIndex, toOrderIndex) => {
+    return fromOrderIndex < toOrderIndex ? "up" : "down";
   };
 
   return (
@@ -35,9 +94,21 @@ const BusShedScreen = () => {
       </View>
       <View style={styles.sec}>
         <Text style={styles.text}>Search Your Destination</Text>
-        <Picker placeholder="From"></Picker>
-        <Picker placeholder="To"></Picker>
-        <DatePic />
+        <Picker
+          placeholder="From"
+          onSelect={(value, orderIndex) => {
+            setFrom(value);
+            setFromOrderIndex(orderIndex);
+          }}
+        />
+        <Picker
+          placeholder="To"
+          onSelect={(value, orderIndex) => {
+            setTo(value);
+            setToOrderIndex(orderIndex);
+          }}
+        />
+        <DatePic onDateChange={(selectedDate) => setDate(selectedDate)} />
         <CustomButton text="Search" onPress={onSearchPressed} />
       </View>
     </ScrollView>
@@ -55,7 +126,6 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     maxHeight: 300,
   },
-
   sec: {
     backgroundColor: "#bbdfea",
     shadowColor: "#abb6ba",
