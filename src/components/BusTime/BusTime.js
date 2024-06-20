@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import axios from "axios";
-import CustomButton from "../../components/CustomButton/Index";
 
 function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   const [schedules, setSchedules] = useState([]);

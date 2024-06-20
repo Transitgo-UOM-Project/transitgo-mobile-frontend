@@ -1,9 +1,36 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import axios from "axios"; // Import axios for HTTP requests
 
-const Picker = ({ placeholder }) => {
+const Picker = ({ placeholder, onSelect }) => {
+  const [busStops, setBusStops] = useState([]);
+
+  useEffect(() => {
+    const loadBusStops = async () => {
+      try {
+        const response = await axios.get("http://192.168.8.102:8080/busstops");
+        const busStopNames = response.data.map((stop) => ({
+          label: stop.name.trim(),
+          value: stop.name,
+          orderIndex: stop.orderIndex, // Include orderIndex
+        }));
+        setBusStops(busStopNames);
+      } catch (error) {
+        console.error("Error loading bus stops:", error.message);
+      }
+    };
+    loadBusStops();
+  }, []);
+
+  const handleValueChange = (value) => {
+    const selectedBusStop = busStops.find((stop) => stop.value === value);
+    if (selectedBusStop) {
+      onSelect(value, selectedBusStop.orderIndex);
+    }
+  };
+
   return (
     <View style={styles.input}>
       <AntDesign
@@ -13,12 +40,8 @@ const Picker = ({ placeholder }) => {
         style={styles.icon}
       />
       <RNPickerSelect
-        onValueChange={(value) => console.log(value)}
-        items={[
-          { label: "Kandy", value: "Kandy" },
-          { label: "Colombo", value: "Colombo" },
-          { label: "Nawalapitiya", value: "Nawalapitiya" },
-        ]}
+        onValueChange={handleValueChange}
+        items={busStops}
         placeholder={{ label: placeholder, value: null }}
         style={pickerSelectStyles}
         useNativeAndroidPickerStyle={false}

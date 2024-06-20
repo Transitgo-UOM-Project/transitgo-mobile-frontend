@@ -11,7 +11,7 @@ import logo from "../../../assets/images/logo.png";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
-import Picker from "@/src/components/Picker/Index";
+import PickerStops from "@/src/components/PickerStops/Index";
 import DatePic from "../../components/DatePic/Index";
 import axios from "axios";
 
@@ -94,14 +94,14 @@ const BusShedScreen = () => {
       </View>
       <View style={styles.sec}>
         <Text style={styles.text}>Search Your Destination</Text>
-        <Picker
+        <PickerStops
           placeholder="From"
           onSelect={(value, orderIndex) => {
             setFrom(value);
             setFromOrderIndex(orderIndex);
           }}
         />
-        <Picker
+        <PickerStops
           placeholder="To"
           onSelect={(value, orderIndex) => {
             setTo(value);
