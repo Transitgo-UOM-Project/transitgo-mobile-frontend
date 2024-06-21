@@ -8,8 +8,9 @@ const CustomBlue = ({
   value,
   setValue,
   placeholder,
-  secureTextEntry,
+  //secureTextEntry,
   icon,
+  onChangeText
 }) => {
   return (
     <View style={styles.container}>
@@ -18,11 +19,12 @@ const CustomBlue = ({
       </View>
       <TextInput
         value={value}
-        onChangeText={setValue}
+        onChangeText={onChangeText}
         placeholder={placeholder}
         style={styles.input}
         placeholderTextColor="white"
-        secureTextEntry={secureTextEntry}
+       // secureTextEntry={secureTextEntry}
+       
       />
     </View>
   );
