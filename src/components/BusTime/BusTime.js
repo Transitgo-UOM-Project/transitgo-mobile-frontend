@@ -1,75 +1,132 @@
-import { View, Text, StyleSheet } from "react-native";
-import React , {useState} from "react";
-import Picker from "../Picker/Index";
-import CustomButton from "../CustomButton/Index";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import axios from "axios";
+import CustomButton from "../CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import { Dimensions } from "react-native";
 
-const BusTime = () => {
-  const [showRules, setShowRules] = useState(false);
+function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const toggleRules = () => {
-    console.warn("drop points");
+  const windowHeight = Dimensions.get("window").height;
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.8.102:8080/bus/${busID}/stops`
+        );
+        setSchedules(response.data);
+        console.log("Fetched schedules:", response.data);
+      } catch (error) {
+        setError("Error fetching bus schedules.");
+        console.error("Error fetching bus schedules:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [busID]);
+
+  const calculateDuration = (startTime, endTime) => {
+    const start = new Date(`1970-01-01T${startTime}Z`);
+    const end = new Date(`1970-01-01T${endTime}Z`);
+    const diff = end - start;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours} Hours and ${minutes} Minutes`;
   };
 
-  const onReviewsPressed = () => {
-    console.warn("Reviews & Ratings");
-    navigation.navigate("ReviewsRatings");
-  };
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>{error}</Text>;
+
+  console.log("Filter direction:", direction);
+  const filteredSchedules = schedules.filter(
+    (schedule) => schedule.direction === direction
+  );
+  console.log("Filtered Schedules:", filteredSchedules);
+
+  const fromSchedule = filteredSchedules.find(
+    (schedule) => schedule.busStop.name === fromStop
+  );
+  const toSchedule = filteredSchedules.find(
+    (schedule) => schedule.busStop.name === toStop
+  );
+
+  if (!fromSchedule || !toSchedule) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            height: windowHeight * 1,
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text>There is no such a route.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  const fromTime = fromSchedule.departureTime;
+  const toTime = toSchedule.arrivalTime;
 
   return (
     <View style={styles.container}>
       <View style={styles.blueUp}>
         <View style={styles.upId}>
           <Text style={styles.smallTextW}>Bus ID: </Text>
-          <Text style={styles.midTextW}>REXY101</Text>
+          <Text style={styles.midTextW}>{busRegNo}</Text>
         </View>
         <View style={styles.upId}>
           <Text style={styles.smallTextW}>Route No: </Text>
-          <Text style={styles.midTextW}>101</Text>
+          <Text style={styles.midTextW}>{routeNo}</Text>
         </View>
       </View>
       <View style={styles.mid}>
         <View>
           <View style={styles.midCon}>
-            <Text style={styles.smallText}>Depature</Text>
-            <Text style={styles.midText}>Colombo</Text>
-          </View>
-          <View style={styles.midCon}>
-            <Text style={styles.smallText}>Date</Text>
-            <Text style={styles.midText}>2024-10-12</Text>
-          </View>
-          <View style={styles.midCon}>
-            <Text style={styles.smallText}>Time</Text>
-            <Text style={styles.midText}>24.00</Text>
+            <Text style={styles.smallText}>From</Text>
+            <Text style={styles.midText}>{fromStop}</Text>
+            <Text style={styles.midText}>{fromTime}</Text>
           </View>
         </View>
         <View>
           <View style={styles.midCon}>
-            <Text style={styles.smallText}>Arrival</Text>
-            <Text style={styles.midText}>Kandy</Text>
+            <Text style={styles.smallText}>Duration</Text>
+            <Text style={styles.midText}>
+              {calculateDuration(fromTime, toTime)}
+            </Text>
           </View>
           <View style={styles.midCon}>
             <Text style={styles.smallText}>Date</Text>
             <Text style={styles.midText}>2024-10-12</Text>
           </View>
-          <View style={styles.midCon}>
-            <Text style={styles.smallText}>Time</Text>
-            <Text style={styles.midText}>06.30</Text>
-          </View>
         </View>
         <View style={styles.midLeft}>
           <View style={styles.downsub}>
-            <Text style={styles.smallText}>Price</Text>
-            <Text style={styles.midText}>200.00</Text>
-          </View>
-          <View style={styles.downsub}>
-            <Text style={styles.smallText}>Available Seats</Text>
-            <Text style={styles.midText}>57</Text>
-          </View>
-          <View style={styles.downsub}>
-            <Text style={styles.smallText}>Duration</Text>
-            <Text style={styles.midText}>04 Hours</Text>
+            <Text style={styles.smallText}>To</Text>
+            <Text style={styles.midText}>{toStop}</Text>
+            <Text style={styles.midText}>{toTime}</Text>
           </View>
         </View>
       </View>
@@ -80,11 +137,15 @@ const BusTime = () => {
             <Text style={styles.midText}>08.00</Text>
           </View>
           <View>
-            <CustomButton type="white" text="Dropping Points" onPress={toggleRules}/>
+            <CustomButton
+              type="white"
+              text="Dropping Points"
+              onPress={() => setModalVisible(true)}
+            />
             <CustomButton
               type="white"
               text="Reviews & Ratings"
-              onPress={onReviewsPressed}
+              onPress={() => navigation.navigate("ReviewsRatings")}
             />
           </View>
           <View style={styles.reddown}>
@@ -93,9 +154,34 @@ const BusTime = () => {
           </View>
         </View>
       </View>
+
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Dropping Points</Text>
+            <ScrollView>
+              {filteredSchedules.map((schedule, index) => (
+                <View key={index} style={styles.scheduleItem}>
+                  <Text style={styles.scheduleText}>
+                    {index === 0
+                      ? `${schedule.busStop.name} - Departure: ${schedule.departureTime}`
+                      : `${schedule.busStop.name} - Arrival: ${schedule.arrivalTime}`}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -171,6 +257,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     color: "white",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  scheduleItem: {
+    padding: 10,
+    borderBottomColor: "#ddd",
+    borderBottomWidth: 1,
+  },
+  scheduleText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#1E2772",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
   },
 });
 

@@ -3,7 +3,6 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/FontAwesome";
 
-
 const CustomInput = ({
   value,
   setValue,
@@ -13,7 +12,7 @@ const CustomInput = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Icon name={icon} size={15} color="#132968"  />
+      <Icon name={icon} size={15} color="#132968" style={styles.icon} />
       <TextInput
         value={value}
         onChangeText={setValue}
@@ -39,7 +38,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 10,
-    paddingLeft:10,
+    paddingLeft: 10,
+  },
+  icon: {
+    marginTop: 6,
   },
 });
 
