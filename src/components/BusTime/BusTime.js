@@ -25,10 +25,9 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
     const fetchSchedules = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.8.102:8080/bus/${busID}/stops`
+          `http://192.168.8.104:8080/bus/${busID}/stops`
         );
         setSchedules(response.data);
-        console.log("Fetched schedules:", response.data);
       } catch (error) {
         setError("Error fetching bus schedules.");
         console.error("Error fetching bus schedules:", error.message);
@@ -81,7 +80,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             justifyContent: "center",
           }}
         >
-          <Text>There is no such a route.</Text>
+          <Text></Text>
         </View>
       </View>
     );

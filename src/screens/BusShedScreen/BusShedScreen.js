@@ -52,7 +52,7 @@ const BusShedScreen = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get("http://192.168.8.102:8080/bus/search", {
+      const response = await axios.get("http://192.168.8.104:8080/bus/search", {
         params: {
           from,
           to,

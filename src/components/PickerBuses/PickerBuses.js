@@ -22,7 +22,7 @@ const PickerBuses = ({
   const fetchAvailableBuses = async () => {
     const direction = fromOrderIndex < toOrderIndex ? "up" : "down";
     try {
-      const response = await axios.get(`http://192.168.8.102:8080/bus/search`, {
+      const response = await axios.get(`http://192.168.8.104:8080/bus/search`, {
         params: {
           from,
           to,
@@ -35,15 +35,27 @@ const PickerBuses = ({
       const busesWithSchedules = await Promise.all(
         buses.map(async (bus) => {
           const scheduleResponse = await axios.get(
-            `http://192.168.8.102:8080/bus/${bus.id}/stops`
+            `http://192.168.8.104:8080/bus/${bus.id}/stops`
           );
           const schedules = scheduleResponse.data;
-          const fromStopSchedule = schedules.find(
-            (schedule) =>
-              schedule.busStop.name === from && schedule.direction === direction
+
+          const filteredSchedules = schedules.filter(
+            (schedule) => schedule.direction === direction
           );
+
+          const fromStopSchedule = filteredSchedules.find(
+            (schedule) => schedule.busStop.name === from
+          );
+
+          const toStopSchedule = filteredSchedules.find(
+            (schedule) => schedule.busStop.name === to
+          );
+
+          if (!fromStopSchedule || !toStopSchedule) {
+            return null; // If either schedule is not found, return null
+          }
           const routeResponse = await axios.get(
-            `http://192.168.8.102:8080/busroute/${bus.routeNo}`
+            `http://192.168.8.104:8080/busroute/${bus.routeNo}`
           );
           const routeName = routeResponse.data.routename;
 
@@ -58,7 +70,11 @@ const PickerBuses = ({
           };
         })
       );
-      setAvailableBuses(busesWithSchedules);
+      const filteredBusesWithSchedules = busesWithSchedules.filter(
+        (bus) => bus !== null
+      );
+
+      setAvailableBuses(filteredBusesWithSchedules);
     } catch (error) {
       console.error("Error fetching available buses:", error);
     }
