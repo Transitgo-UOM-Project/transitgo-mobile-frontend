@@ -6,11 +6,11 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import axios from "axios";
 import CustomButton from "../CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-import { Dimensions } from "react-native";
 
 function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   const [schedules, setSchedules] = useState([]);
@@ -51,11 +51,9 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>{error}</Text>;
 
-  console.log("Filter direction:", direction);
   const filteredSchedules = schedules.filter(
     (schedule) => schedule.direction === direction
   );
-  console.log("Filtered Schedules:", filteredSchedules);
 
   const fromSchedule = filteredSchedules.find(
     (schedule) => schedule.busStop.name === fromStop
@@ -80,7 +78,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             justifyContent: "center",
           }}
         >
-          <Text></Text>
+          <Text>xvvv</Text>
         </View>
       </View>
     );
@@ -144,7 +142,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             <CustomButton
               type="white"
               text="Reviews & Ratings"
-              onPress={() => navigation.navigate("ReviewsRatings")}
+              onPress={() => navigation.navigate("ReviewsRatings", { busID })}
             />
           </View>
           <View style={styles.reddown}>
@@ -291,7 +289,8 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "white",
-    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

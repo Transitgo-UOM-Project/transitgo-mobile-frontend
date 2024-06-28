@@ -5,31 +5,68 @@ import {
   FlatList,
   TextInput,
   SafeAreaView,
-  ScrollView
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Rating, AirbnbRating } from "react-native-ratings";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import Header from "../../components/Header/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const ReviewsRat = () => {
+const ReviewsRat = ({ route }) => {
+  const { busID } = route.params;
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(3);
   const [reviewList, setReviewList] = useState([]);
   const [editReview, setEditReview] = useState(null);
 
+  useEffect(() => {
+    // Fetch existing reviews
+    axios
+      .get(`http://192.168.8.104:8080/rates/${busID}`)
+      .then((response) => {
+        setReviewList(
+          response.data.map((item) => ({
+            key: item.id.toString(),
+            review: item.review,
+            rating: item.rate,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews: ", error);
+      });
+  }, [busID]);
+
   const onSubmitReview = () => {
     if (review === "") {
       return;
     }
-    setReviewList([
-      ...reviewList,
-      { key: Date.now().toString(), review, rating },
-    ]);
-    setReview("");
-    setRating(3);
+
+    const newReview = {
+      username: "username", // Replace with actual username
+      profile: null,
+      rate: rating,
+      review: review,
+      buses: {
+        busId: busID,
+      },
+    };
+
+    axios
+      .post("http://192.168.8.104:8080/rate/bus", newReview)
+      .then((response) => {
+        setReviewList([
+          ...reviewList,
+          { key: response.data.id.toString(), review, rating },
+        ]);
+        setReview("");
+        setRating(3);
+      })
+      .catch((error) => {
+        console.error("Error submitting review: ", error);
+      });
   };
 
   const onDeleteReview = (key) => {
@@ -60,7 +97,7 @@ const ReviewsRat = () => {
     return (
       <View style={styles.list}>
         <View style={styles.listver}>
-          <Text>Name</Text>
+          <Text>name</Text>
           <AirbnbRating
             count={5}
             defaultRating={item.rating}
@@ -116,10 +153,7 @@ const ReviewsRat = () => {
         ) : (
           <CustomButton text="Submit" onPress={onSubmitReview} />
         )}
-        <FlatList
-          data={reviewList}
-          renderItem={renderReview}
-        />
+        <FlatList data={reviewList} renderItem={renderReview} />
       </View>
     </SafeAreaView>
   );
@@ -177,7 +211,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
   },
-
 });
 
 export default ReviewsRat;
