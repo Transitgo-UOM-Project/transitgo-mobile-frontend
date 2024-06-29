@@ -71,23 +71,7 @@ function BusTime({
   );
 
   if (!fromSchedule || !toSchedule) {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            height: windowHeight * 1,
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        ></View>
-      </View>
-    );
+    return;
   }
 
   const fromTime = fromSchedule.departureTime;
@@ -190,6 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 10,
+
     flexDirection: "column",
     backgroundColor: "#bbdfea",
     shadowColor: "#abb6ba",
