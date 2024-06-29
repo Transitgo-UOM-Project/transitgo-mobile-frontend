@@ -12,7 +12,15 @@ import axios from "axios";
 import CustomButton from "../CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 
-function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
+function BusTime({
+  busID,
+  busRegNo,
+  routeNo,
+  fromStop,
+  toStop,
+  direction,
+  date,
+}) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -114,7 +122,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
           </View>
           <View style={styles.midCon}>
             <Text style={styles.smallText}>Date</Text>
-            <Text style={styles.midText}>2024-10-12</Text>
+            <Text style={styles.midText}>{date}</Text>
           </View>
         </View>
         <View style={styles.midLeft}>
