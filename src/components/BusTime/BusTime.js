@@ -25,7 +25,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
     const fetchSchedules = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.8.104:8080/bus/${busID}/stops`
+          `http://192.168.8.103:8080/bus/${busID}/stops`
         );
         setSchedules(response.data);
       } catch (error) {
@@ -77,9 +77,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             alignItems: "center",
             justifyContent: "center",
           }}
-        >
-          <Text>xvvv</Text>
-        </View>
+        ></View>
       </View>
     );
   }

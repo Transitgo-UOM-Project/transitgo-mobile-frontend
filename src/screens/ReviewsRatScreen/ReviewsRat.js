@@ -24,13 +24,16 @@ const ReviewsRat = ({ route }) => {
   useEffect(() => {
     // Fetch existing reviews
     axios
-      .get(`http://192.168.8.104:8080/rates/${busID}`)
+      .get(`http://192.168.8.103:8080/rates/${busID}`)
       .then((response) => {
         setReviewList(
           response.data.map((item) => ({
             key: item.id.toString(),
+            username: item.username,
             review: item.review,
             rating: item.rate,
+            date: item.createdAt,
+            profileColor: getRandomColor(), // Assign a random color
           }))
         );
       })
@@ -39,27 +42,63 @@ const ReviewsRat = ({ route }) => {
       });
   }, [busID]);
 
+  const getRandomColor = () => {
+    const colors = [
+      "#FF5733",
+      "#33FF57",
+      "#3357FF",
+      "#FF33A1",
+      "#A133FF",
+      "#33FFF7",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const formatDateTime = (date) => {
+    const pad = (num, size) => `000${num}`.slice(size * -1);
+    const time = date.getTime();
+    const milliseconds = `00${time % 1000}`.slice(-3);
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1, 2)}-${pad(
+      date.getDate(),
+      2
+    )} ${pad(date.getHours(), 2)}:${pad(date.getMinutes(), 2)}:${pad(
+      date.getSeconds(),
+      2
+    )}.${milliseconds}`;
+  };
+
   const onSubmitReview = () => {
     if (review === "") {
       return;
     }
 
+    const date = new Date();
+    const formattedDate = formatDateTime(date);
+
     const newReview = {
-      username: "username", // Replace with actual username
+      username: "",
       profile: null,
       rate: rating,
       review: review,
+      date: formattedDate, // Add the formatted date
       buses: {
         busId: busID,
       },
     };
 
     axios
-      .post("http://192.168.8.104:8080/rate/bus", newReview)
+      .post("http://192.168.8.103:8080/rate/bus", newReview)
       .then((response) => {
         setReviewList([
           ...reviewList,
-          { key: response.data.id.toString(), review, rating },
+          {
+            key: response.data.id.toString(),
+            review,
+            rating,
+            date: formattedDate,
+            profileColor: getRandomColor(), // Assign a random color
+          },
         ]);
         setReview("");
         setRating(3);
@@ -97,7 +136,16 @@ const ReviewsRat = ({ route }) => {
     return (
       <View style={styles.list}>
         <View style={styles.listver}>
-          <Text>name</Text>
+          <View style={styles.userprofile}>
+            <View
+              style={[
+                styles.profileIcon,
+                { backgroundColor: item.profileColor },
+              ]}
+            >
+              <Icon name="user" size={20} color="#fff" />
+            </View>
+          </View>
           <AirbnbRating
             count={5}
             defaultRating={item.rating}
@@ -106,8 +154,12 @@ const ReviewsRat = ({ route }) => {
             showRating={false}
           />
           <Text style={styles.listText}>{item.review}</Text>
+          <View style={styles.foot}>
+            <Text style={styles.dateText}>{item.date}</Text>
+            <Text style={styles.postedbyText}>by : {item.username}</Text>
+          </View>
 
-          <View style={styles.pad}>
+          {/* <View style={styles.pad}>
             <Icon
               name="trash"
               size={15}
@@ -122,7 +174,7 @@ const ReviewsRat = ({ route }) => {
               color="#132968"
               onPress={() => onEditReview(item)}
             />
-          </View>
+          </View> */}
         </View>
       </View>
     );
@@ -189,6 +241,18 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     padding: 5,
   },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  userprofile: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   pad: {
     flexDirection: "row",
     padding: 5,
@@ -200,8 +264,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
   },
-  iconSpacer: {
-    width: 10,
+  foot: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%", // Make sure the parent View takes full width
+  },
+  dateText: {
+    color: "#888",
+    fontSize: 12,
+    paddingTop: 5,
+  },
+  postedbyText: {
+    color: "#888",
+    fontSize: 12,
+    paddingTop: 5,
+    textAlign: "right", // Align text to the right
   },
   input: {
     width: "100%",
