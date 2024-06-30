@@ -5,31 +5,107 @@ import {
   FlatList,
   TextInput,
   SafeAreaView,
-  ScrollView
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Rating, AirbnbRating } from "react-native-ratings";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import Header from "../../components/Header/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const ReviewsRat = () => {
+const ReviewsRat = ({ route }) => {
+  const { busID } = route.params;
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(3);
   const [reviewList, setReviewList] = useState([]);
   const [editReview, setEditReview] = useState(null);
 
+  useEffect(() => {
+    // Fetch existing reviews
+    axios
+      .get(`http://192.168.8.103:8080/rates/${busID}`)
+      .then((response) => {
+        setReviewList(
+          response.data.map((item) => ({
+            key: item.id.toString(),
+            username: item.username,
+            review: item.review,
+            rating: item.rate,
+            date: item.createdAt,
+            profileColor: getRandomColor(), // Assign a random color
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews: ", error);
+      });
+  }, [busID]);
+
+  const getRandomColor = () => {
+    const colors = [
+      "#FF5733",
+      "#33FF57",
+      "#3357FF",
+      "#FF33A1",
+      "#A133FF",
+      "#33FFF7",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const formatDateTime = (date) => {
+    const pad = (num, size) => `000${num}`.slice(size * -1);
+    const time = date.getTime();
+    const milliseconds = `00${time % 1000}`.slice(-3);
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1, 2)}-${pad(
+      date.getDate(),
+      2
+    )} ${pad(date.getHours(), 2)}:${pad(date.getMinutes(), 2)}:${pad(
+      date.getSeconds(),
+      2
+    )}.${milliseconds}`;
+  };
+
   const onSubmitReview = () => {
     if (review === "") {
       return;
     }
-    setReviewList([
-      ...reviewList,
-      { key: Date.now().toString(), review, rating },
-    ]);
-    setReview("");
-    setRating(3);
+
+    const date = new Date();
+    const formattedDate = formatDateTime(date);
+
+    const newReview = {
+      username: "",
+      profile: null,
+      rate: rating,
+      review: review,
+      date: formattedDate, // Add the formatted date
+      buses: {
+        busId: busID,
+      },
+    };
+
+    axios
+      .post("http://192.168.8.103:8080/rate/bus", newReview)
+      .then((response) => {
+        setReviewList([
+          ...reviewList,
+          {
+            key: response.data.id.toString(),
+            review,
+            rating,
+            date: formattedDate,
+            profileColor: getRandomColor(), // Assign a random color
+          },
+        ]);
+        setReview("");
+        setRating(3);
+      })
+      .catch((error) => {
+        console.error("Error submitting review: ", error);
+      });
   };
 
   const onDeleteReview = (key) => {
@@ -60,7 +136,16 @@ const ReviewsRat = () => {
     return (
       <View style={styles.list}>
         <View style={styles.listver}>
-          <Text>Name</Text>
+          <View style={styles.userprofile}>
+            <View
+              style={[
+                styles.profileIcon,
+                { backgroundColor: item.profileColor },
+              ]}
+            >
+              <Icon name="user" size={20} color="#fff" />
+            </View>
+          </View>
           <AirbnbRating
             count={5}
             defaultRating={item.rating}
@@ -69,8 +154,12 @@ const ReviewsRat = () => {
             showRating={false}
           />
           <Text style={styles.listText}>{item.review}</Text>
+          <View style={styles.foot}>
+            <Text style={styles.dateText}>{item.date}</Text>
+            <Text style={styles.postedbyText}>by : {item.username}</Text>
+          </View>
 
-          <View style={styles.pad}>
+          {/* <View style={styles.pad}>
             <Icon
               name="trash"
               size={15}
@@ -85,7 +174,7 @@ const ReviewsRat = () => {
               color="#132968"
               onPress={() => onEditReview(item)}
             />
-          </View>
+          </View> */}
         </View>
       </View>
     );
@@ -116,10 +205,7 @@ const ReviewsRat = () => {
         ) : (
           <CustomButton text="Submit" onPress={onSubmitReview} />
         )}
-        <FlatList
-          data={reviewList}
-          renderItem={renderReview}
-        />
+        <FlatList data={reviewList} renderItem={renderReview} />
       </View>
     </SafeAreaView>
   );
@@ -155,6 +241,18 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     padding: 5,
   },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  userprofile: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   pad: {
     flexDirection: "row",
     padding: 5,
@@ -166,8 +264,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
   },
-  iconSpacer: {
-    width: 10,
+  foot: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%", // Make sure the parent View takes full width
+  },
+  dateText: {
+    color: "#888",
+    fontSize: 12,
+    paddingTop: 5,
+  },
+  postedbyText: {
+    color: "#888",
+    fontSize: 12,
+    paddingTop: 5,
+    textAlign: "right", // Align text to the right
   },
   input: {
     width: "100%",
@@ -177,7 +289,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
   },
-
 });
 
 export default ReviewsRat;
