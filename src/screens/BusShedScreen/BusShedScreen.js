@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
   ScrollView,
   Alert,
+  ImageBackground,
 } from "react-native";
 import React, { useState } from "react";
 import logo from "../../../assets/images/logo.png";
@@ -52,7 +53,7 @@ const BusShedScreen = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get("http://192.168.8.102:8080/bus/search", {
+      const response = await axios.get("http://192.168.8.103:8080/bus/search", {
         params: {
           from,
           to,
@@ -82,7 +83,10 @@ const BusShedScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.root}>
+    <ImageBackground
+      style={styles.background}
+      source={require("../../../assets/images/pikaso_bus.png")}
+    >
       <View style={styles.al}>
         <Image
           source={logo}
@@ -90,27 +94,29 @@ const BusShedScreen = () => {
           resizeMode="contain"
         />
       </View>
-      <View style={styles.sec}>
-        <Text style={styles.text}>Search Your Destination</Text>
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <PickerStops
-          placeholder="From"
-          onSelect={(value, orderIndex) => {
-            setFrom(value);
-            setFromOrderIndex(orderIndex);
-          }}
-        />
-        <PickerStops
-          placeholder="To"
-          onSelect={(value, orderIndex) => {
-            setTo(value);
-            setToOrderIndex(orderIndex);
-          }}
-        />
-        <DatePic onDateChange={(selectedDate) => setDate(selectedDate)} />
-        <CustomButton text="Search" onPress={onSearchPressed} />
-      </View>
-    </ScrollView>
+      <ScrollView style={styles.root}>
+        <View style={styles.sec}>
+          <Text style={styles.text}>Search Your Destination</Text>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          <PickerStops
+            placeholder="From"
+            onSelect={(value, orderIndex) => {
+              setFrom(value);
+              setFromOrderIndex(orderIndex);
+            }}
+          />
+          <PickerStops
+            placeholder="To"
+            onSelect={(value, orderIndex) => {
+              setTo(value);
+              setToOrderIndex(orderIndex);
+            }}
+          />
+          <DatePic onDateChange={(selectedDate) => setDate(selectedDate)} />
+          <CustomButton text="Search" onPress={onSearchPressed} />
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 };
 
@@ -145,6 +151,12 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginBottom: 10,
+  },
+  background: {
+    flex: 1,
+    // remove width and height to override fixed static size
+    width: null,
+    height: null,
   },
 });
 

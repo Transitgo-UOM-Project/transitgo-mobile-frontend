@@ -10,12 +10,26 @@ const Picker = ({ placeholder, onSelect }) => {
   useEffect(() => {
     const loadBusStops = async () => {
       try {
-        const response = await axios.get("http://192.168.8.102:8080/busstops");
-        const busStopNames = response.data.map((stop) => ({
-          label: stop.name.trim(),
-          value: stop.name,
-          orderIndex: stop.orderIndex, // Include orderIndex
-        }));
+        const busStopData = await axios.get(
+          "http://192.168.8.103:8080/busstops"
+        );
+        // Use a Set to store unique bus stop names
+        const uniqueNamesSet = new Set();
+        const busStopNames = busStopData.data
+          .filter((stop) => {
+            if (uniqueNamesSet.has(stop.name.trim())) {
+              return false; // Exclude duplicate names
+            } else {
+              uniqueNamesSet.add(stop.name.trim());
+              return true; // Include unique names
+            }
+          })
+          .map((stop) => ({
+            label: stop.name.trim(),
+            value: stop.name,
+            orderIndex: stop.orderIndex, // Include orderIndex
+          }));
+
         setBusStops(busStopNames);
       } catch (error) {
         console.error("Error loading bus stops:", error.message);
