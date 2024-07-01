@@ -8,6 +8,8 @@ import FoundItemScreen from "../screens/FoundItemScreen/Index"
 import FoundScreen from "../screens/FoundScreen/Index"
 import LostScreen from "../screens/LostScreen/Index"
 import LostItemScreen from "../screens/LostItemScreen/Index"
+import EditFoundItemScreen from "../screens/EditFoundItemScreen/Index"
+import EditLostItemScreen from "../screens/EditLostItemScreen/Index"
 
 
 
@@ -22,6 +24,8 @@ const LostFound = () => {
         <Stack.Screen name="FoundScreen" component={FoundScreen} />
         <Stack.Screen name="LostScreen" component={LostScreen} />
         <Stack.Screen name="LostItemScreen" component={LostItemScreen} />
+        <Stack.Screen name="EditFoundItemScreen" component={EditFoundItemScreen} />
+        <Stack.Screen name="EditLostItemScreen" component={EditLostItemScreen} />
         
       </Stack.Navigator>
   );

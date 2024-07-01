@@ -6,13 +6,21 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import axios from "axios";
 import CustomButton from "../CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-import { Dimensions } from "react-native";
 
-function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
+function BusTime({
+  busID,
+  busRegNo,
+  routeNo,
+  fromStop,
+  toStop,
+  direction,
+  date,
+}) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,10 +33,9 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
     const fetchSchedules = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.8.102:8080/bus/${busID}/stops`
+          `http://192.168.8.103:8080/bus/${busID}/stops`
         );
         setSchedules(response.data);
-        console.log("Fetched schedules:", response.data);
       } catch (error) {
         setError("Error fetching bus schedules.");
         console.error("Error fetching bus schedules:", error.message);
@@ -52,11 +59,9 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>{error}</Text>;
 
-  console.log("Filter direction:", direction);
   const filteredSchedules = schedules.filter(
     (schedule) => schedule.direction === direction
   );
-  console.log("Filtered Schedules:", filteredSchedules);
 
   const fromSchedule = filteredSchedules.find(
     (schedule) => schedule.busStop.name === fromStop
@@ -66,25 +71,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
   );
 
   if (!fromSchedule || !toSchedule) {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            height: windowHeight * 1,
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text>There is no such a route.</Text>
-        </View>
-      </View>
-    );
+    return;
   }
 
   const fromTime = fromSchedule.departureTime;
@@ -119,7 +106,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
           </View>
           <View style={styles.midCon}>
             <Text style={styles.smallText}>Date</Text>
-            <Text style={styles.midText}>2024-10-12</Text>
+            <Text style={styles.midText}>{date}</Text>
           </View>
         </View>
         <View style={styles.midLeft}>
@@ -145,7 +132,7 @@ function BusTime({ busID, busRegNo, routeNo, fromStop, toStop, direction }) {
             <CustomButton
               type="white"
               text="Reviews & Ratings"
-              onPress={() => navigation.navigate("ReviewsRatings")}
+              onPress={() => navigation.navigate("ReviewsRatings", { busID })}
             />
           </View>
           <View style={styles.reddown}>
@@ -187,6 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 10,
+
     flexDirection: "column",
     backgroundColor: "#bbdfea",
     shadowColor: "#abb6ba",
@@ -292,7 +280,8 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "white",
-    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
