@@ -99,13 +99,8 @@ const Moving = () => {
 
     try {
       const response = await axios.post(
-<<<<<<< HEAD
-        'http://192.168.8.102:8080/package',
-        pack,
-=======
-        "http://192.168.8.104:8080/package",
+        "http://192.168.8.160192.168.8.104:8080/package",
         pack
->>>>>>> daacbee2647db4f9d543923d4e25c72053f8403d
       );
       if (response.status === 200) {
         Alert.alert('Success', 'Booking confirmed!');

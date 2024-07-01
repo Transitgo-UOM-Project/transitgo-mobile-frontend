@@ -24,7 +24,7 @@ const EditLostItemScreen = () => {
     };
 
     try {
-      const response = await axios.put(`http://192.168.179.137:8080/lost/${item.id}`, updatedItem);
+      const response = await axios.put(`http://192.168.8.160:8080/lost/${item.id}`, updatedItem);
       console.log('Item updated:', response.data);
 
       updateLostItems(); // Refresh the lostItems list in FoundItemScreen
