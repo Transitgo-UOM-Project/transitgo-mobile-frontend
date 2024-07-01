@@ -18,6 +18,9 @@ import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import Config from "@/config";
+
+const apiURL = Config.API_BASE_URL;
 
 const SignUpScreen = () => {
   const [firstname, setFirstname] = useState("");
@@ -72,16 +75,15 @@ const SignUpScreen = () => {
       }
 
       try{
-        // await axios.post("http://192.168.8.156:8080/api/v1/auth/register",{
-        //   fname: firstname,
-        //   lname: lastname,
-        //   email: email,
-        //   uname: username,
-        //   password: password,
-        //   confirmpassword: passwordRepeat,
-        //   type: userType,
-        //});
-      
+        await axios.post(`${apiURL}/api/v1/auth/register`,{
+          fname: firstname,
+          lname: lastname,
+          email: email,
+          uname: username,
+          password: password,
+          confirmpassword: passwordRepeat,
+          type: userType,
+        });
         Alert.alert("Registration Successful");
         navigation("ConfirmEmail");
       }catch(error){
@@ -117,7 +119,8 @@ const SignUpScreen = () => {
             value={firstname}
             setValue={setFirstname}
           />
-          {formErrors.firstname ? <Text style={styles.error}>{formErrors.firstname}</Text> : null}
+          {formErrors.firstname ? 
+          <Text style={styles.error}>{formErrors.firstname}</Text> : null}
           <CustomInput
             placeholder="Last Name"
             value={lastname}

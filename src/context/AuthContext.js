@@ -4,7 +4,13 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { Alert } from "react-native";
 import {validateEmail,validatePassword} from "../components/Validations";
+import Config from "@/config";
+
+const apiURL = Config.API_BASE_URL;
+
 export const AuthContext = createContext();
+
+
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userToken, setUserToken] = useState(null);
@@ -32,7 +38,7 @@ export const AuthProvider = ({ children }) => {
          }
 
     try{
-      const response = await axios.post("http://192.168.8.156:8080/api/v1/auth/authentication",{
+      const response = await axios.post(`${apiURL}/api/v1/auth/authentication`,{
         email: username,
         password: password}
       );
