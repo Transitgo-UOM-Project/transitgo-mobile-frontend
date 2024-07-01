@@ -22,7 +22,7 @@ const PickerBuses = ({
   const fetchAvailableBuses = async () => {
     const direction = fromOrderIndex < toOrderIndex ? "up" : "down";
     try {
-      const response = await axios.get(`http://192.168.8.103:8080/bus/search`, {
+      const response = await axios.get(`http://192.168.8.160:8080/bus/search`, {
         params: {
           from,
           to,
@@ -35,7 +35,7 @@ const PickerBuses = ({
       const busesWithSchedules = await Promise.all(
         buses.map(async (bus) => {
           const scheduleResponse = await axios.get(
-            `http://192.168.8.103:8080/bus/${bus.id}/stops`
+            `http://192.168.8.160:8080/bus/${bus.id}/stops`
           );
           const schedules = scheduleResponse.data;
 
@@ -55,7 +55,7 @@ const PickerBuses = ({
             return null; // If either schedule is not found, return null
           }
           const routeResponse = await axios.get(
-            `http://192.168.8.103:8080/busroute/${bus.routeNo}`
+            `http://192.168.8.160:8080/busroute/${bus.routeNo}`
           );
           const routeName = routeResponse.data.routename;
 

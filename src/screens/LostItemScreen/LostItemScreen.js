@@ -30,8 +30,7 @@ const LostItemScreen = () => {
   }, []);
 
   const fetchLostItems = () => {
-    console.log("iPPPP ", apiUrl);
-    fetch(`${apiUrl}/losts`)
+    fetch("http://192.168.8.160:8080/losts")
       .then((response) => response.json())
       .then((data) => {
         setLostItems(data);
@@ -55,7 +54,7 @@ const LostItemScreen = () => {
   };
 
   const handleDelete = (item) => {
-    fetch(`${apiUrl}/lost/${item.id}`, {
+    fetch(`http://192.168.8.160:8080/lost/${item.id}`, {
       method: "DELETE",
     })
       .then((response) => {

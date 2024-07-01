@@ -25,7 +25,7 @@ const Announcement = () => {
   const fetchAnnouncements = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.8.103:8080/announcements"
+        "http://192.168.8.160:8080/announcements"
       );
       setAnnlist(response.data);
     } catch (error) {
@@ -39,7 +39,7 @@ const Announcement = () => {
     }
     try {
       const response = await axios.post(
-        "http://192.168.8.103:8080/announcement",
+        "http://192.168.8.160:8080/announcement",
         { details: ann }
       );
       setAnnlist([...annlist, response.data]);
@@ -56,7 +56,7 @@ const Announcement = () => {
 
   const onUpdate = async () => {
     try {
-      await axios.put(`http://192.168.8.103:8080/announcement/${editlist.id}`, {
+      await axios.put(`http://192.168.8.160:8080/announcement/${editlist.id}`, {
         details: ann,
       });
       const updatedAnn = annlist.map((item) => {
@@ -75,7 +75,7 @@ const Announcement = () => {
 
   const onDelete = async (id) => {
     try {
-      await axios.delete(`http://192.168.8.103:8080/announcement/${id}`);
+      await axios.delete(`http://192.168.8.160:8080/announcement/${id}`);
       const updatedDelete = annlist.filter((ann) => ann.id !== id);
       setAnnlist(updatedDelete);
       Alert.alert("Announcement deleted successfully.");

@@ -35,7 +35,7 @@ const Lost = () => {
     };
 
     try {
-      const response = await axios.post("http://192.168.8.103:8080/lost", data);
+      const response = await axios.post("http://192.168.8.160:8080/lost", data);
 
       console.log("POST response:", response.data);
 
