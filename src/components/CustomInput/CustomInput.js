@@ -11,7 +11,7 @@ const CustomInput = ({
   icon,
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, hidden && styles.hidden]}>
       <Icon name={icon} size={15} color="#132968" style={styles.icon} />
       <TextInput
         value={value}
