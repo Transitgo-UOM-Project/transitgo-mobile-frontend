@@ -12,6 +12,9 @@ import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import axios from "axios"; // Import axios for HTTP requests
 import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Lost = () => {
   const [name, setName] = useState("");
@@ -35,7 +38,7 @@ const Lost = () => {
     };
 
     try {
-      const response = await axios.post("http://192.168.8.160:8080/lost", data);
+      const response = await axios.post(`${apiUrl}/lost`, data);
 
       console.log("POST response:", response.data);
 

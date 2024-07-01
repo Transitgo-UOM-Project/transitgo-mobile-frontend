@@ -12,6 +12,9 @@ import Header from "../../components/Header/Index";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Announcement = () => {
   const [ann, setAnn] = useState("");
@@ -24,9 +27,7 @@ const Announcement = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get(
-        "http://192.168.8.160:8080/announcements"
-      );
+      const response = await axios.get(`${apiUrl}/announcements`);
       setAnnlist(response.data);
     } catch (error) {
       console.error("Error fetching announcements:", error);
@@ -38,10 +39,9 @@ const Announcement = () => {
       return;
     }
     try {
-      const response = await axios.post(
-        "http://192.168.8.160:8080/announcement",
-        { details: ann }
-      );
+      const response = await axios.post(`${apiUrl}/announcement`, {
+        details: ann,
+      });
       setAnnlist([...annlist, response.data]);
       setAnn("");
     } catch (error) {
@@ -56,7 +56,7 @@ const Announcement = () => {
 
   const onUpdate = async () => {
     try {
-      await axios.put(`http://192.168.8.160:8080/announcement/${editlist.id}`, {
+      await axios.put(`${apiUrl}/announcement/${editlist.id}`, {
         details: ann,
       });
       const updatedAnn = annlist.map((item) => {
@@ -75,7 +75,7 @@ const Announcement = () => {
 
   const onDelete = async (id) => {
     try {
-      await axios.delete(`http://192.168.8.160:8080/announcement/${id}`);
+      await axios.delete(`${apiUrl}/announcement/${id}`);
       const updatedDelete = annlist.filter((ann) => ann.id !== id);
       setAnnlist(updatedDelete);
       Alert.alert("Announcement deleted successfully.");

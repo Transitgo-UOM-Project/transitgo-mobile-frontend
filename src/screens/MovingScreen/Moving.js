@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,22 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
-} from 'react-native';
-import CustomInput from '@/src/components/CustomInput/Index';
-import CustomButton from '@/src/components/CustomButton/Index';
-import DatePic from '@/src/components/DatePic/Index';
-import PickerStops from '../../components/PickerStops/Index';
-import PickerBuses from '../../components/PickerBuses/Index';
-import axios from 'axios';
-import {useNavigation} from '@react-navigation/native';
+} from "react-native";
+import CustomInput from "@/src/components/CustomInput/Index";
+import CustomButton from "@/src/components/CustomButton/Index";
+import DatePic from "@/src/components/DatePic/Index";
+import PickerStops from "../../components/PickerStops/Index";
+import PickerBuses from "../../components/PickerBuses/Index";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Moving = () => {
-  const [name, setName] = useState('');
-  const [id, setId] = useState('');
-  const [number, setNumber] = useState('');
+  const [name, setName] = useState("");
+  const [id, setId] = useState("");
+  const [number, setNumber] = useState("");
   const [from, setFrom] = useState(null);
   const [fromOrderIndex, setFromOrderIndex] = useState(null);
   const [to, setTo] = useState(null);
@@ -39,35 +42,35 @@ const Moving = () => {
     const newErrors = {};
 
     if (!from) {
-      newErrors.from = 'From location is required.';
+      newErrors.from = "From location is required.";
     }
 
     if (!to) {
-      newErrors.to = 'To location is required.';
+      newErrors.to = "To location is required.";
     }
 
     if (!date) {
-      newErrors.date = 'Date is required.';
+      newErrors.date = "Date is required.";
     }
 
     if (!selectedBus) {
-      newErrors.selectedBus = 'Bus selection is required.';
+      newErrors.selectedBus = "Bus selection is required.";
     }
 
     if (!name) {
-      newErrors.name = 'Receiver name is required.';
+      newErrors.name = "Receiver name is required.";
     } else if (/\d/.test(name)) {
-      newErrors.name = 'Receiver name cannot contain numbers.';
+      newErrors.name = "Receiver name cannot contain numbers.";
     }
 
     if (!number) {
-      newErrors.number = 'Receiver contact number is required.';
+      newErrors.number = "Receiver contact number is required.";
     } else if (!/^\d{9,10}$/.test(number)) {
-      newErrors.number = 'Receiver contact number must be 9 or 10 digits.';
+      newErrors.number = "Receiver contact number must be 9 or 10 digits.";
     }
 
     if (!id) {
-      newErrors.id = 'Receiver ID is required.';
+      newErrors.id = "Receiver ID is required.";
     } else if (!/^\d{12}$/.test(id) && !/^\d{9}[vV]$/.test(id)) {
       newErrors.id =
         "Receiver ID must be 12 digits or 9 digits followed by 'V'.";
@@ -81,36 +84,33 @@ const Moving = () => {
     setSubmitAttempted(true);
 
     if (!validateForm()) {
-      Alert.alert('Failed', 'Please fill all the fields correctly.');
+      Alert.alert("Failed", "Please fill all the fields correctly.");
       return;
     }
 
     const pack = {
       busID: selectedBus,
       destination: to,
-      payment: '',
+      payment: "",
       receivedDate: date,
       start: from,
-      status: '',
+      status: "",
       receiverName: name,
       receiverContact: number,
       receiverNIC: id,
     };
 
     try {
-      const response = await axios.post(
-        "http://192.168.8.160192.168.8.104:8080/package",
-        pack
-      );
+      const response = await axios.post(`${apiUrl}/package`, pack);
       if (response.status === 200) {
-        Alert.alert('Success', 'Booking confirmed!');
-        navigation.navigate('PackageScreen');
+        Alert.alert("Success", "Booking confirmed!");
+        navigation.navigate("PackageScreen");
       } else {
-        Alert.alert('Error', 'Failed to confirm booking. Please try again.');
+        Alert.alert("Error", "Failed to confirm booking. Please try again.");
       }
     } catch (error) {
-      console.error('Error confirming booking:', error);
-      Alert.alert('Error', 'Failed to confirm booking. Please try again.');
+      console.error("Error confirming booking:", error);
+      Alert.alert("Error", "Failed to confirm booking. Please try again.");
     }
   };
 
@@ -138,7 +138,7 @@ const Moving = () => {
         {submitAttempted && errors.to && (
           <Text style={styles.error}>{errors.to}</Text>
         )}
-        <DatePic onDateChange={selectedDate => setDate(selectedDate)} />
+        <DatePic onDateChange={(selectedDate) => setDate(selectedDate)} />
         {submitAttempted && errors.date && (
           <Text style={styles.error}>{errors.date}</Text>
         )}
@@ -148,7 +148,7 @@ const Moving = () => {
           date={date}
           fromOrderIndex={fromOrderIndex}
           toOrderIndex={toOrderIndex}
-          onSelectBus={busID => setSelectedBus(busID)}
+          onSelectBus={(busID) => setSelectedBus(busID)}
         />
         {submitAttempted && errors.selectedBus && (
           <Text style={styles.error}>{errors.selectedBus}</Text>
@@ -194,18 +194,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   head: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 32,
-    color: '#132968',
+    color: "#132968",
     paddingBottom: 10,
     paddingTop: 15,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   safe: {
     marginBottom: 20,
   },
   error: {
-    color: 'red',
+    color: "red",
     marginTop: 5,
   },
 });

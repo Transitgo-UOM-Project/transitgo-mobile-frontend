@@ -11,6 +11,9 @@ import {
 import axios from "axios";
 import CustomButton from "../CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 function BusTime({
   busID,
@@ -32,9 +35,7 @@ function BusTime({
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
-        const response = await axios.get(
-          `http://192.168.8.160:8080/bus/${busID}/stops`
-        );
+        const response = await axios.get(`${apiUrl}/bus/${busID}/stops`);
         setSchedules(response.data);
       } catch (error) {
         setError("Error fetching bus schedules.");

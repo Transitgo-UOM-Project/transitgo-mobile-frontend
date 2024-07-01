@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import axios from "axios"; // Import axios for HTTP requests
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Picker = ({ placeholder, onSelect }) => {
   const [busStops, setBusStops] = useState([]);
@@ -10,9 +13,7 @@ const Picker = ({ placeholder, onSelect }) => {
   useEffect(() => {
     const loadBusStops = async () => {
       try {
-        const busStopData = await axios.get(
-          "http://192.168.8.160:8080/busstops"
-        );
+        const busStopData = await axios.get(`${apiUrl}/busstops`);
         // Use a Set to store unique bus stop names
         const uniqueNamesSet = new Set();
         const busStopNames = busStopData.data

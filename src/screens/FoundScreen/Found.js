@@ -11,6 +11,8 @@ import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import axios from "axios"; // Import axios for HTTP requests
 import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+const apiUrl = Config.API_BASE_URL;
 
 const Found = () => {
   const [name, setName] = useState("");
@@ -34,10 +36,7 @@ const Found = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://192.168.8.160:8080/found",
-        data
-      );
+      const response = await axios.post(`${apiUrl}/found`, data);
 
       console.log("POST response:", response.data);
 

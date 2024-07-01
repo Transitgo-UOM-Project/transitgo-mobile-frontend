@@ -30,7 +30,7 @@ const LostItemScreen = () => {
   }, []);
 
   const fetchLostItems = () => {
-    fetch("http://192.168.8.160:8080/losts")
+    fetch(`${apiUrl}/losts`)
       .then((response) => response.json())
       .then((data) => {
         setLostItems(data);
@@ -54,7 +54,7 @@ const LostItemScreen = () => {
   };
 
   const handleDelete = (item) => {
-    fetch(`http://192.168.8.160:8080/lost/${item.id}`, {
+    fetch(`${apiUrl}/lost/${item.id}`, {
       method: "DELETE",
     })
       .then((response) => {

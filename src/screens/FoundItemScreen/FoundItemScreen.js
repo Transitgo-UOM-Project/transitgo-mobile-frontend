@@ -11,6 +11,9 @@ import {
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const FoundItemScreen = () => {
   const [foundItems, setFoundItems] = useState([]);
@@ -23,7 +26,7 @@ const FoundItemScreen = () => {
   }, []);
 
   const fetchFoundItems = () => {
-    fetch("http://192.168.8.160:8080/founds")
+    fetch(`${apiUrl}/founds`)
       .then((response) => response.json())
       .then((data) => {
         setFoundItems(data);
@@ -46,7 +49,7 @@ const FoundItemScreen = () => {
   };
 
   const handleDelete = (item) => {
-    fetch(`http://192.168.8.160:8080/found/${item.id}`, {
+    fetch(`${apiUrl}/found/${item.id}`, {
       method: "DELETE",
     })
       .then((response) => {

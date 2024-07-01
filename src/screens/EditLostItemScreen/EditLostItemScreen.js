@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const EditLostItemScreen = () => {
   const route = useRoute();
@@ -25,7 +28,7 @@ const EditLostItemScreen = () => {
 
     try {
       const response = await axios.put(
-        `http://192.168.8.160:8080/lost/${item.id}`,
+        `${apiUrl}/lost/${item.id}`,
         updatedItem
       );
       console.log("Item updated:", response.data);
