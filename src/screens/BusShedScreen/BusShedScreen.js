@@ -15,6 +15,9 @@ import { useNavigation } from "@react-navigation/native";
 import PickerStops from "../../components/PickerStops/Index";
 import DatePic from "../../components/DatePic/Index";
 import axios from "axios";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const BusShedScreen = () => {
   const { height } = useWindowDimensions();
@@ -53,7 +56,7 @@ const BusShedScreen = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get("http://192.168.8.103:8080/bus/search", {
+      const response = await axios.get(`${apiUrl}/bus/search`, {
         params: {
           from,
           to,

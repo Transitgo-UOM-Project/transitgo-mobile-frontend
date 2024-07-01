@@ -1,8 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import CustomBlue from '../../components/CustomBlue/Index';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useState, useEffect } from "react";
+import Config from "../../../config";
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import CustomBlue from "../../components/CustomBlue/Index";
+import Icon from "react-native-vector-icons/FontAwesome";
+
+const apiUrl = Config.API_BASE_URL;
 
 const LostItemScreen = () => {
   const route = useRoute();
@@ -11,63 +23,68 @@ const LostItemScreen = () => {
 
   const [lostItems, setLostItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchLostItems();
   }, []);
 
   const fetchLostItems = () => {
-    fetch('http://192.168.179.137:8080/losts')
-      .then(response => response.json())
-      .then(data => {
+    fetch(`${apiUrl}/losts`)
+      .then((response) => response.json())
+      .then((data) => {
         setLostItems(data);
         setFilteredItems(data);
       })
-      .catch(error => {
-        console.error('Error fetching found items:', error);
+      .catch((error) => {
+        console.error("Error fetching lost items:", error);
       });
   };
 
-  const formatDate = dateTime => {
+  const formatDate = (dateTime) => {
     const options = {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
     };
     return new Date(dateTime).toLocaleDateString(undefined, options);
   };
 
-  const handleDelete = item => {
-    fetch(`http://192.168.179.137:8080/lost/${item.id}`, {
-      method: 'DELETE',
+  const handleDelete = (item) => {
+    fetch(`${apiUrl}/lost/${item.id}`, {
+      method: "DELETE",
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
-          setLostItems(lostItems.filter(lostItem => lostItem.id !== item.id));
-          setFilteredItems(filteredItems.filter(lostItem => lostItem.id !== item.id));
-          Alert.alert('Item Deleted Successfully');
+          setLostItems(lostItems.filter((lostItem) => lostItem.id !== item.id));
+          setFilteredItems(
+            filteredItems.filter((lostItem) => lostItem.id !== item.id)
+          );
+          Alert.alert("Item Deleted Successfully");
         } else {
-          throw new Error('Failed to delete item');
+          throw new Error("Failed to delete item");
         }
       })
-      .catch(error => {
-        console.error('Error deleting item:', error);
-        Alert.alert('Failed to delete item');
+      .catch((error) => {
+        console.error("Error deleting item:", error);
+        Alert.alert("Failed to delete item");
       });
   };
 
-  const handleEdit = item => {
-    navigation.navigate('EditLostItemScreen', { item, updateLostItems: fetchLostItems });
+  const handleEdit = (item) => {
+    navigation.navigate("EditLostItemScreen", {
+      item,
+      updateLostItems: fetchLostItems,
+    });
   };
 
-  const handleSearch = text => {
+  const handleSearch = (text) => {
     setSearchQuery(text);
     const filteredData = lostItems.filter(
-      item =>
+      (item) =>
         item.bus_Description.toLowerCase().includes(text.toLowerCase()) ||
         item.item_Description.toLowerCase().includes(text.toLowerCase())
     );
@@ -85,8 +102,8 @@ const LostItemScreen = () => {
             onChangeText={handleSearch}
             value={searchQuery}
           />
-          
-          {filteredItems.map(item => (
+
+          {filteredItems.map((item) => (
             <View key={item.id} style={styles.itemContainer}>
               {item.name && (
                 <Text style={styles.label}>
@@ -95,22 +112,26 @@ const LostItemScreen = () => {
               )}
               {item.mobile_Number && (
                 <Text style={styles.label}>
-                  Mobile Number: <Text style={styles.value}>{item.mobile_Number}</Text>
+                  Mobile Number:{" "}
+                  <Text style={styles.value}>{item.mobile_Number}</Text>
                 </Text>
               )}
               {item.bus_Description && (
                 <Text style={styles.label}>
-                  Bus Details: <Text style={styles.value}>{item.bus_Description}</Text>
+                  Bus Details:{" "}
+                  <Text style={styles.value}>{item.bus_Description}</Text>
                 </Text>
               )}
               {item.item_Description && (
                 <Text style={styles.label}>
-                  Description: <Text style={styles.value}>{item.item_Description}</Text>
+                  Description:{" "}
+                  <Text style={styles.value}>{item.item_Description}</Text>
                 </Text>
               )}
               {item.dateTime && (
                 <Text style={styles.labelred}>
-                  Posted on: <Text style={styles.value}>{formatDate(item.dateTime)}</Text>
+                  Posted on:{" "}
+                  <Text style={styles.value}>{formatDate(item.dateTime)}</Text>
                 </Text>
               )}
               <View style={styles.card}>
@@ -142,38 +163,38 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    color: '#132968',
+    color: "#132968",
     paddingTop: 5,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   itemContainer: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     padding: 15,
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 20,
   },
   label: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
   },
   labelred: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
-    color: 'red',
+    color: "red",
   },
   value: {
-    fontWeight: 'normal',
+    fontWeight: "normal",
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 5,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   icon: {
     marginHorizontal: 5,

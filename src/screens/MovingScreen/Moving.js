@@ -14,6 +14,9 @@ import PickerStops from "../../components/PickerStops/Index";
 import PickerBuses from "../../components/PickerBuses/Index";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Moving = () => {
   const [name, setName] = useState("");
@@ -98,10 +101,7 @@ const Moving = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://192.168.8.104:8080/package",
-        pack
-      );
+      const response = await axios.post(`${apiUrl}/package`, pack);
       if (response.status === 200) {
         Alert.alert("Success", "Booking confirmed!");
         navigation.navigate("PackageScreen");

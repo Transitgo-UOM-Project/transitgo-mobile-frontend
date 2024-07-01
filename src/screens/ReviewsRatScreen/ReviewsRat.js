@@ -13,6 +13,9 @@ import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import Header from "../../components/Header/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const ReviewsRat = ({ route }) => {
   const { busID } = route.params;
@@ -24,7 +27,7 @@ const ReviewsRat = ({ route }) => {
   useEffect(() => {
     // Fetch existing reviews
     axios
-      .get(`http://192.168.8.103:8080/rates/${busID}`)
+      .get(`${apiUrl}/rates/${busID}`)
       .then((response) => {
         setReviewList(
           response.data.map((item) => ({
@@ -88,7 +91,7 @@ const ReviewsRat = ({ route }) => {
     };
 
     axios
-      .post("http://192.168.8.103:8080/rate/bus", newReview)
+      .post(`${apiUrl}/rate/bus`, newReview)
       .then((response) => {
         setReviewList([
           ...reviewList,

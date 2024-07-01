@@ -1,18 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
-import CustomInput from '@/src/components/CustomInput/Index';
-import CustomButton from '@/src/components/CustomButton/Index';
-import axios from 'axios'; // Import axios for HTTP requests
-import { useNavigation } from '@react-navigation/native';
-
-
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
+import CustomInput from "@/src/components/CustomInput/Index";
+import CustomButton from "@/src/components/CustomButton/Index";
+import axios from "axios"; // Import axios for HTTP requests
+import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+const apiUrl = Config.API_BASE_URL;
 
 const Found = () => {
-  const [name, setName] = useState('');
-  const [bus_Description, setBus] = useState('');
-  const [mobile_Number, setNumber] = useState('');
-  const [item_Description, setDescription] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [name, setName] = useState("");
+  const [bus_Description, setBus] = useState("");
+  const [mobile_Number, setNumber] = useState("");
+  const [item_Description, setDescription] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const navigation = useNavigation();
 
@@ -25,51 +32,62 @@ const Found = () => {
       bus_Description,
       mobile_Number: mobile_Number || null, // Set to null if not provided
       item_Description,
-      postedOn
+      postedOn,
     };
-  
+
     try {
-      const response = await axios.post('http://192.168.179.137:8080/found', data);
-  
-      console.log('POST response:', response.data);
-  
+      const response = await axios.post(`${apiUrl}/found`, data);
+
+      console.log("POST response:", response.data);
+
       // Check if response.data is an array before sorting
       if (Array.isArray(response.data)) {
-        const sortedItems = response.data.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+        const sortedItems = response.data.sort(
+          (a, b) => new Date(b.dateTime) - new Date(a.dateTime)
+        );
         setItems(sortedItems); //sort by date time
       } else {
-        console.error('Expected response data to be an array, but got:', typeof response.data);
+        console.error(
+          "Expected response data to be an array, but got:",
+          typeof response.data
+        );
       }
-  
+
       // Navigate to FoundItemScreen with the submitted data
-      navigation.navigate('FoundItemScreen', {
+      navigation.navigate("FoundItemScreen", {
         list: { ...data },
       });
-  
+
       // Clear input fields after successful submission
-      setBus('');
-      setName('');
-      setDescription('');
-      setNumber('');
-      setErrorMsg('');
+      setBus("");
+      setName("");
+      setDescription("");
+      setNumber("");
+      setErrorMsg("");
     } catch (error) {
-      console.error('Error submitting data:', error);
-  
+      console.error("Error submitting data:", error);
+
       if (error.response && error.response.status === 400) {
         // Backend validation error
-        const { Mobile_Number, Name, Bus_Description, Item_Description } = error.response.data;
-        setErrorMsg(`${Mobile_Number || Name || Bus_Description || Item_Description}`);
+        const {
+          Mobile_Number,
+          Name,
+          Bus_Description,
+          Item_Description,
+        } = error.response.data;
+        setErrorMsg(
+          `${Mobile_Number || Name || Bus_Description || Item_Description}`
+        );
       } else {
         // Other types of errors
-        Alert.alert('Error', 'Failed to submit data. Please try again later.');
+        Alert.alert("Error", "Failed to submit data. Please try again later.");
       }
     }
   };
-  
 
   const SubmitLost = () => {
-    console.warn('Submit Lost');
-    navigation.navigate('LostScreen');
+    console.warn("Submit Lost");
+    navigation.navigate("LostScreen");
   };
 
   return (
@@ -110,7 +128,6 @@ const Found = () => {
             onPress={SubmitLost}
             type="tertiary1"
           />
-
         </View>
       </SafeAreaView>
     </ScrollView>
@@ -123,17 +140,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     padding: 20,
   },
   title: {
     fontSize: 25,
-    color: '#132968',
+    color: "#132968",
     paddingTop: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   error: {
-    color: 'red',
+    color: "red",
     marginTop: 10,
   },
 });
