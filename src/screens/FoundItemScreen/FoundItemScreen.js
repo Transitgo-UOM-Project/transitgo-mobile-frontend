@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
-import CustomBlue from '../../components/CustomBlue/Index';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const FoundItemScreen = () => {
   const [foundItems, setFoundItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -15,62 +26,63 @@ const FoundItemScreen = () => {
   }, []);
 
   const fetchFoundItems = () => {
-    fetch('http://192.168.8.160:8080/founds')
-      .then(response => response.json())
-      .then(data => {
+    fetch(`${apiUrl}/founds`)
+      .then((response) => response.json())
+      .then((data) => {
         setFoundItems(data);
       })
-      .catch(error => {
-        console.error('Error fetching found items:', error);
+      .catch((error) => {
+        console.error("Error fetching found items:", error);
       });
   };
 
   const formatDate = (dateTime) => {
-    const options = { 
-      year: 'numeric', 
-      month: 'numeric', 
-      day: 'numeric', 
-      hour: 'numeric', 
-      minute: 'numeric', 
-      second: 'numeric' 
+    const options = {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
     };
     return new Date(dateTime).toLocaleDateString(undefined, options);
   };
 
   const handleDelete = (item) => {
-    fetch(`http://192.168.8.160:8080/found/${item.id}`, {
-      method: 'DELETE'
+    fetch(`${apiUrl}/found/${item.id}`, {
+      method: "DELETE",
     })
-    .then(response => {
-      if (response.ok) {
-        setFoundItems(foundItems.filter(foundItem => foundItem.id !== item.id));
-        Alert.alert('Item Deleted Successfully');
-      } else {
-        throw new Error('Failed to delete item');
-      }
-    })
-    .catch(error => {
-      console.error('Error deleting item:', error);
-      Alert.alert('Failed to delete item');
-    });
+      .then((response) => {
+        if (response.ok) {
+          setFoundItems(
+            foundItems.filter((foundItem) => foundItem.id !== item.id)
+          );
+          Alert.alert("Item Deleted Successfully");
+        } else {
+          throw new Error("Failed to delete item");
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting item:", error);
+        Alert.alert("Failed to delete item");
+      });
   };
 
   const handleEdit = (item) => {
-    navigation.navigate('EditFoundItemScreen', { 
-      item, 
-      updateFoundItems: fetchFoundItems // Pass the function that refreshes the found items list
+    navigation.navigate("EditFoundItemScreen", {
+      item,
+      updateFoundItems: fetchFoundItems, // Pass the function that refreshes the found items list
     });
   };
-  const handleSearch = text => {
+  const handleSearch = (text) => {
     setSearchQuery(text);
     const filteredData = foundItems.filter(
-      item =>
+      (item) =>
         item.bus_Description.toLowerCase().includes(text.toLowerCase()) ||
         item.item_Description.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredItems(filteredData);
   };
-
 
   return (
     <ScrollView style={styles.container}>
@@ -85,7 +97,7 @@ const FoundItemScreen = () => {
             value={searchQuery}
           />
 
-          {filteredItems.map(item => (
+          {filteredItems.map((item) => (
             <View key={item.id} style={styles.itemContainer}>
               {item.name && (
                 <Text style={styles.label}>
@@ -94,22 +106,26 @@ const FoundItemScreen = () => {
               )}
               {item.mobile_Number && (
                 <Text style={styles.label}>
-                  Mobile Number: <Text style={styles.value}>{item.mobile_Number}</Text>
+                  Mobile Number:{" "}
+                  <Text style={styles.value}>{item.mobile_Number}</Text>
                 </Text>
               )}
               {item.bus_Description && (
                 <Text style={styles.label}>
-                  Bus Details: <Text style={styles.value}>{item.bus_Description}</Text>
+                  Bus Details:{" "}
+                  <Text style={styles.value}>{item.bus_Description}</Text>
                 </Text>
               )}
               {item.item_Description && (
                 <Text style={styles.label}>
-                  Description: <Text style={styles.value}>{item.item_Description}</Text>
+                  Description:{" "}
+                  <Text style={styles.value}>{item.item_Description}</Text>
                 </Text>
               )}
               {item.dateTime && (
                 <Text style={styles.labelred}>
-                  Posted on: <Text style={styles.value}>{formatDate(item.dateTime)}</Text>
+                  Posted on:{" "}
+                  <Text style={styles.value}>{formatDate(item.dateTime)}</Text>
                 </Text>
               )}
               <View style={styles.pad}>
@@ -142,37 +158,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 25,
     paddingTop: 5,
-    color: '#132968',
-    fontWeight: 'bold',
+    color: "#132968",
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   itemContainer: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     padding: 15,
-    borderColor: 'darkblue',
+    borderColor: "darkblue",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 20,
   },
   label: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
   },
   labelred: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
-    color: 'red',
+    color: "red",
   },
   value: {
-    fontWeight: 'normal',
+    fontWeight: "normal",
   },
   pad: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 5,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   icon: {
     marginHorizontal: 5,
@@ -180,5 +196,3 @@ const styles = StyleSheet.create({
 });
 
 export default FoundItemScreen;
-
-

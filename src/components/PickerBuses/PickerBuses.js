@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const PickerBuses = ({
   from,
@@ -22,7 +25,7 @@ const PickerBuses = ({
   const fetchAvailableBuses = async () => {
     const direction = fromOrderIndex < toOrderIndex ? "up" : "down";
     try {
-      const response = await axios.get(`http://192.168.8.160:8080/bus/search`, {
+      const response = await axios.get(`${apiUrl}/bus/search`, {
         params: {
           from,
           to,
@@ -35,7 +38,7 @@ const PickerBuses = ({
       const busesWithSchedules = await Promise.all(
         buses.map(async (bus) => {
           const scheduleResponse = await axios.get(
-            `http://192.168.8.160:8080/bus/${bus.id}/stops`
+            `${apiUrl}/bus/${bus.id}/stops`
           );
           const schedules = scheduleResponse.data;
 
@@ -55,7 +58,7 @@ const PickerBuses = ({
             return null; // If either schedule is not found, return null
           }
           const routeResponse = await axios.get(
-            `http://192.168.8.160:8080/busroute/${bus.routeNo}`
+            `${apiUrl}/busroute/${bus.routeNo}`
           );
           const routeName = routeResponse.data.routename;
 

@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   View,
   Text,
@@ -7,14 +7,17 @@ import {
   SafeAreaView,
   FlatList,
   Alert,
-} from 'react-native';
-import Header from '../../components/Header/Index';
-import CustomInput from '@/src/components/CustomInput/Index';
-import CustomButton from '@/src/components/CustomButton/Index';
-import Icon from 'react-native-vector-icons/FontAwesome';
+} from "react-native";
+import Header from "../../components/Header/Index";
+import CustomInput from "@/src/components/CustomInput/Index";
+import CustomButton from "@/src/components/CustomButton/Index";
+import Icon from "react-native-vector-icons/FontAwesome";
+import Config from "../../../config";
+
+const apiUrl = Config.API_BASE_URL;
 
 const Announcement = () => {
-  const [ann, setAnn] = useState('');
+  const [ann, setAnn] = useState("");
   const [annlist, setAnnlist] = useState([]);
   const [editlist, setEditlist] = useState(null);
 
@@ -24,68 +27,65 @@ const Announcement = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get(
-        'http://192.168.8.160:8080/announcements',
-      );
+      const response = await axios.get(`${apiUrl}/announcements`);
       setAnnlist(response.data);
     } catch (error) {
-      console.error('Error fetching announcements:', error);
+      console.error("Error fetching announcements:", error);
     }
   };
 
   const onbutPressed = async () => {
-    if (ann === '') {
+    if (ann === "") {
       return;
     }
     try {
-      const response = await axios.post(
-        'http://192.168.8.160:8080/announcement',
-        {details: ann},
-      );
+      const response = await axios.post(`${apiUrl}/announcement`, {
+        details: ann,
+      });
       setAnnlist([...annlist, response.data]);
-      setAnn('');
+      setAnn("");
     } catch (error) {
-      console.error('Error adding announcement:', error);
+      console.error("Error adding announcement:", error);
     }
   };
 
-  const onEdit = ann => {
+  const onEdit = (ann) => {
     setEditlist(ann);
     setAnn(ann.details);
   };
 
   const onUpdate = async () => {
     try {
-      await axios.put(`http://192.168.8.160:8080/announcement/${editlist.id}`, {
+      await axios.put(`${apiUrl}/announcement/${editlist.id}`, {
         details: ann,
       });
-      const updatedAnn = annlist.map(item => {
+      const updatedAnn = annlist.map((item) => {
         if (item.id === editlist.id) {
-          return {...item, details: ann};
+          return { ...item, details: ann };
         }
         return item;
       });
       setAnnlist(updatedAnn);
       setEditlist(null);
-      setAnn('');
+      setAnn("");
     } catch (error) {
-      console.error('Error updating announcement:', error);
+      console.error("Error updating announcement:", error);
     }
   };
 
-  const onDelete = async id => {
+  const onDelete = async (id) => {
     try {
-      await axios.delete(`http://192.168.8.160:8080/announcement/${id}`);
-      const updatedDelete = annlist.filter(ann => ann.id !== id);
+      await axios.delete(`${apiUrl}/announcement/${id}`);
+      const updatedDelete = annlist.filter((ann) => ann.id !== id);
       setAnnlist(updatedDelete);
-      Alert.alert('Announcement deleted successfully.');
+      Alert.alert("Announcement deleted successfully.");
     } catch (error) {
-      console.error('Error deleting announcement:', error);
-      Alert.alert('Failed to delete announcement.');
+      console.error("Error deleting announcement:", error);
+      Alert.alert("Failed to delete announcement.");
     }
   };
 
-  const renderAnn = ({item}) => {
+  const renderAnn = ({ item }) => {
     return (
       <View style={styles.list}>
         <Text style={styles.listText}>{item.details}</Text>
@@ -115,7 +115,7 @@ const Announcement = () => {
           <CustomInput
             placeholder="Add Announcement"
             value={ann}
-            setValue={userText => setAnn(userText)}
+            setValue={(userText) => setAnn(userText)}
           />
           {editlist ? (
             <CustomButton text="Save" onPress={onUpdate} />
@@ -132,7 +132,7 @@ const Announcement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
   },
   content: {
     flex: 1,
@@ -140,15 +140,15 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   list: {
-    backgroundColor: '#9bedfd33',
+    backgroundColor: "#9bedfd33",
     paddingHorizontal: 8,
     paddingVertical: 12,
     marginBottom: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   listText: {
-    color: '#132968',
+    color: "#132968",
     fontSize: 17,
     flex: 1,
   },
