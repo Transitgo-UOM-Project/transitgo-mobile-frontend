@@ -177,10 +177,10 @@ const styles = StyleSheet.create({
 
     flexDirection: "column",
     backgroundColor: "#bbdfea",
-    shadowColor: "#abb6ba",
+    //shadowColor: "#abb6ba",
     borderRadius: 5,
     elevation: 3,
-    shadowOpacity: 1,
+    //shadowOpacity: 1,
   },
   blueUp: {
     flexDirection: "row",

@@ -18,10 +18,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     
     backgroundColor: "#1976d2",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    //shadowColor: "#000",
+    //shadowOffset: { width: 0, height: 10 },
+    //shadowOpacity: 0.25,
+    //shadowRadius: 10,
     elevation: 10,
   },
   text: {

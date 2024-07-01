@@ -22,10 +22,9 @@ const SigninScreen = () => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  // const onSignInPressed = () => {
-  //   console.warn("sign in");
-  //   // navigation.navigate('HomeScreen')
-  // };
+   const onSignInPressed = () => {
+     login(username, password);
+   };
 
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
@@ -54,7 +53,7 @@ const SigninScreen = () => {
         resizeMode="contain"
       />
       <CustomInput
-        placeholder="Username or Email address"
+        placeholder="Email address"
         value={username}
         setValue={setUsername}
         icon="user"
@@ -67,7 +66,7 @@ const SigninScreen = () => {
         icon="lock"
       />
 
-      <CustomButton text="Sign In" onPress={() => {login()}} />
+      <CustomButton text="Sign In" onPress={onSignInPressed} />
       <View style={styles.sec}>
         <View>
           <CustomButton

@@ -33,8 +33,8 @@ const styles = StyleSheet.create({
     // margin:1,
     marginVertical: 5,
     borderRadius: 5,
-    shadowColor:"#FA6B6B",
-    shadowOpacity:0.75,
+    //shadowColor:"#FA6B6B",
+    //shadowOpacity:0.75,
   },
   content: {
     width: "100%",

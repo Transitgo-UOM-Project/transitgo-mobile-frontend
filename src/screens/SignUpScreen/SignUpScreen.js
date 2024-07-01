@@ -1,17 +1,23 @@
 import {
   View,
   Text,
-  Image,
+  Alert,
   StyleSheet,
   useWindowDimensions,
   ScrollView,
   SafeAreaView,
 } from "react-native";
+import { validateFname,
+  validateLname,
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  validateConfirmpassword } from "../../components/Validations";
 import React, { useState } from "react";
-import logo from "../../../assets/images/logo.png";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const SignUpScreen = () => {
   const [firstname, setFirstname] = useState("");
@@ -20,13 +26,69 @@ const SignUpScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [userType, setUserType] = useState("passenger");
 
-  const { height } = useWindowDimensions();
+
+  //const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  const onSignUpPressed = () => {
+  const [formErrors, setFormErrors] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmpassword: ""
+  });
+
+  const onSignUpPressed = async() => {
+    
     console.warn("sign up");
-    navigation.navigate("ConfirmEmail");
+    const fnameValidation = validateFname(firstname);
+    const lnameValidation = validateLname(lastname);
+    const usernameValidation = validateUsername(username);
+    const emailValidation = validateEmail(email);
+    const passwordValidation = validatePassword(password);
+    const confirmpasswordValidation = validateConfirmpassword(password,passwordRepeat);
+
+    if (!fnameValidation.isValid ||
+      !lnameValidation.isValid ||
+      !usernameValidation.isValid ||
+      !emailValidation.isValid ||
+      !passwordValidation.isValid ||
+      !confirmpasswordValidation.isValid){
+          setFormErrors(
+            {
+            firstname: fnameValidation.Message,
+            lastname: lnameValidation.Message,
+            username: usernameValidation.Message,
+            email: emailValidation.Message,
+            password: passwordValidation.Message,
+            confirmpassword: confirmpasswordValidation.Message
+            }
+          );
+          console.warn(formErrors);
+          return;
+      }
+
+      try{
+        // await axios.post("http://192.168.8.156:8080/api/v1/auth/register",{
+        //   fname: firstname,
+        //   lname: lastname,
+        //   email: email,
+        //   uname: username,
+        //   password: password,
+        //   confirmpassword: passwordRepeat,
+        //   type: userType,
+        //});
+      
+        Alert.alert("Registration Successful");
+        navigation("ConfirmEmail");
+      }catch(error){
+        Alert.alert("Something went wrong, please try again later.");
+      }
+      
+    
   };
 
   const onSignInGoogle = () => {
@@ -55,28 +117,53 @@ const SignUpScreen = () => {
             value={firstname}
             setValue={setFirstname}
           />
+          {formErrors.firstname ? <Text style={styles.error}>{formErrors.firstname}</Text> : null}
           <CustomInput
             placeholder="Last Name"
             value={lastname}
             setValue={setLastname}
           />
-          <CustomInput placeholder="E-mail" value={email} setValue={setEmail} />
+          {formErrors.lastname ? (
+            <Text style={styles.error}>{formErrors.lastname}</Text>
+          ) : null}
+          <CustomInput 
+            placeholder="E-mail" 
+            value={email} 
+            setValue={setEmail} 
+          />
+          {formErrors.email ? (
+            <Text style={styles.error}>{formErrors.email}</Text>
+          ) : null}
           <CustomInput
             placeholder="Username"
             value={username}
             setValue={setUsername}
           />
+          {formErrors.username ? (
+            <Text style={styles.error}>{formErrors.username}</Text>
+          ) : null}
           <CustomInput
             placeholder="Password"
             value={password}
             setValue={setPassword}
             secureTextEntry={true}
           />
+          {formErrors.password ? (
+            <Text style={styles.error}>{formErrors.password}</Text>
+          ) : null}
           <CustomInput
             placeholder=" Re-Enter Password"
             value={passwordRepeat}
             setValue={setPasswordRepeat}
             secureTextEntry={true}
+          />
+          {formErrors.confirmpassword ? (
+            <Text style={styles.error}>{formErrors.confirmpassword}</Text>
+          ) : null}
+          <CustomInput
+            value={userType}
+            setValue={setUserType}
+            hidden={true}
           />
 
           <CustomButton text="Sign Up" onPress={onSignUpPressed} />
