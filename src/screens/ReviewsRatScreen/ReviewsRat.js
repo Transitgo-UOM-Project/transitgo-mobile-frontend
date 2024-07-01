@@ -24,7 +24,7 @@ const ReviewsRat = ({ route }) => {
   useEffect(() => {
     // Fetch existing reviews
     axios
-      .get(`http://192.168.8.103:8080/rates/${busID}`)
+      .get(`http://192.168.8.160:8080/rates/${busID}`)
       .then((response) => {
         setReviewList(
           response.data.map((item) => ({

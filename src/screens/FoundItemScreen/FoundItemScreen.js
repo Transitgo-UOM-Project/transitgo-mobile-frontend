@@ -15,7 +15,7 @@ const FoundItemScreen = () => {
   }, []);
 
   const fetchFoundItems = () => {
-    fetch('http://192.168.179.137:8080/founds')
+    fetch('http://192.168.8.160:8080/founds')
       .then(response => response.json())
       .then(data => {
         setFoundItems(data);
@@ -38,7 +38,7 @@ const FoundItemScreen = () => {
   };
 
   const handleDelete = (item) => {
-    fetch(`http://192.168.179.137:8080/found/${item.id}`, {
+    fetch(`http://192.168.8.160:8080/found/${item.id}`, {
       method: 'DELETE'
     })
     .then(response => {

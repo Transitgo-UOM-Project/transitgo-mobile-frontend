@@ -11,7 +11,7 @@ const Picker = ({ placeholder, onSelect }) => {
     const loadBusStops = async () => {
       try {
         const busStopData = await axios.get(
-          "http://192.168.8.103:8080/busstops"
+          "http://192.168.8.160:8080/busstops"
         );
         // Use a Set to store unique bus stop names
         const uniqueNamesSet = new Set();
