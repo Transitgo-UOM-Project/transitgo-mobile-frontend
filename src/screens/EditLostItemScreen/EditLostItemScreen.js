@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert } from 'react-native';
-import axios from 'axios';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import axios from "axios";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const EditLostItemScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { item, updateLostItems } = route.params;
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [name, setName] = useState(item.name);
   const [busDescription, setBusDescription] = useState(item.bus_Description);
@@ -24,27 +24,30 @@ const EditLostItemScreen = () => {
     };
 
     try {
-      const response = await axios.put(`http://192.168.179.137:8080/lost/${item.id}`, updatedItem);
-      console.log('Item updated:', response.data);
+      const response = await axios.put(
+        `http://192.168.8.103:8080/lost/${item.id}`,
+        updatedItem
+      );
+      console.log("Item updated:", response.data);
 
       updateLostItems(); // Refresh the lostItems list in FoundItemScreen
 
       navigation.goBack(); // Navigate back to the previous screen
     } catch (error) {
-      console.error('Error updating item:', error);
+      console.error("Error updating item:", error);
 
       if (error.response && error.response.status === 400) {
         // Backend validation error
         const errorData = error.response.data;
-        const errorMessage = Object.values(errorData).join('\n'); // Combine all error messages
+        const errorMessage = Object.values(errorData).join("\n"); // Combine all error messages
         setErrorMsg(errorMessage);
       } else {
         // Other types of errors
-        setErrorMsg('Failed to update item. Please try again later.');
+        setErrorMsg("Failed to update item. Please try again later.");
       }
 
       // Display alert with the error message
-      Alert.alert('Failed to update item', errorMsg);
+      Alert.alert("Failed to update item", errorMsg);
     }
   };
 
@@ -76,11 +79,9 @@ const EditLostItemScreen = () => {
         onChangeText={setItemDescription}
       />
 
-{errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
+      {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
 
       <Button title="Save" onPress={handleSave} />
-
-    
     </View>
   );
 };
@@ -92,20 +93,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     paddingTop: 5,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginBottom: 20,
     borderRadius: 5,
   },
   error: {
-    color: 'red',
+    color: "red",
     marginTop: 10,
   },
 });

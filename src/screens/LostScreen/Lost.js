@@ -1,8 +1,16 @@
-import { View, Text, StatusBar, StyleSheet, SafeAreaView,ScrollView ,Alert} from "react-native";
+import {
+  View,
+  Text,
+  StatusBar,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Alert,
+} from "react-native";
 import React, { useState } from "react";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
-import axios from 'axios'; // Import axios for HTTP requests
+import axios from "axios"; // Import axios for HTTP requests
 import { useNavigation } from "@react-navigation/native";
 
 const Lost = () => {
@@ -10,7 +18,7 @@ const Lost = () => {
   const [bus_Description, setBus] = useState("");
   const [mobile_Number, setNumber] = useState("");
   const [item_Description, setDescription] = useState("");
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
   const navigation = useNavigation();
 
@@ -23,50 +31,58 @@ const Lost = () => {
       bus_Description,
       mobile_Number: mobile_Number || null, // Set to null if not provided
       item_Description,
-      postedOn
+      postedOn,
     };
 
     try {
-      const response = await axios.post('http://192.168.179.137:8080/lost', data);
-  
-      console.log('POST response:', response.data);
-  
+      const response = await axios.post("http://192.168.8.103:8080/lost", data);
+
+      console.log("POST response:", response.data);
+
       // Check if response.data is an array before sorting
       if (Array.isArray(response.data)) {
-        const sortedItems = response.data.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+        const sortedItems = response.data.sort(
+          (a, b) => new Date(b.dateTime) - new Date(a.dateTime)
+        );
         setItems(sortedItems); //sort by date time
       } else {
-        console.error('Expected response data to be an array, but got:', typeof response.data);
+        console.error(
+          "Expected response data to be an array, but got:",
+          typeof response.data
+        );
       }
-  
+
       // Navigate to FoundItemScreen with the submitted data
-      navigation.navigate('LostItemScreen', {
+      navigation.navigate("LostItemScreen", {
         list: { ...data },
       });
 
-       // Clear input fields after successful submission
-       setBus('');
-       setName('');
-       setDescription('');
-       setNumber('');
-       setErrorMsg('');
-     } catch (error) {
-       console.error('Error submitting data:', error);
-   
-       if (error.response && error.response.status === 400) {
-         // Backend validation error
-         const { Mobile_Number, Name, Bus_Description, Item_Description } = error.response.data;
-         setErrorMsg(`${Mobile_Number || Name || Bus_Description || Item_Description}`);
-       } else {
-         // Other types of errors
-         Alert.alert('Error', 'Failed to submit data. Please try again later.');
-       }
-     }
-   };
-   
- 
-  
+      // Clear input fields after successful submission
+      setBus("");
+      setName("");
+      setDescription("");
+      setNumber("");
+      setErrorMsg("");
+    } catch (error) {
+      console.error("Error submitting data:", error);
 
+      if (error.response && error.response.status === 400) {
+        // Backend validation error
+        const {
+          Mobile_Number,
+          Name,
+          Bus_Description,
+          Item_Description,
+        } = error.response.data;
+        setErrorMsg(
+          `${Mobile_Number || Name || Bus_Description || Item_Description}`
+        );
+      } else {
+        // Other types of errors
+        Alert.alert("Error", "Failed to submit data. Please try again later.");
+      }
+    }
+  };
 
   const SubmitFound = () => {
     console.warn("Submit found");
@@ -102,7 +118,7 @@ const Lost = () => {
             setValue={setDescription}
             icon="pencil"
           ></CustomInput>
-           {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
+          {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
           <CustomButton text="Submit" onPress={Submit}></CustomButton>
           <CustomButton
             text="Submit Found Item!"
@@ -119,10 +135,10 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  roo:{
-    flex:1,
-    alignItems:"center",
-    padding:20
+  roo: {
+    flex: 1,
+    alignItems: "center",
+    padding: 20,
   },
   Text: {
     fontSize: 25,
@@ -131,7 +147,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   error: {
-    color: 'red',
+    color: "red",
     marginTop: 10,
   },
 });
