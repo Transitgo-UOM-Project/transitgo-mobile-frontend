@@ -7,12 +7,14 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { validateFname,
+import {
+  validateFname,
   validateLname,
   validateUsername,
   validateEmail,
   validatePassword,
-  validateConfirmpassword } from "../../components/Validations";
+  validateConfirmpassword,
+} from "../../components/Validations";
 import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
@@ -31,7 +33,6 @@ const SignUpScreen = () => {
   const [passwordRepeat, setPasswordRepeat] = useState("");
   const [userType, setUserType] = useState("passenger");
 
-
   //const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
@@ -41,56 +42,56 @@ const SignUpScreen = () => {
     email: "",
     username: "",
     password: "",
-    confirmpassword: ""
+    confirmpassword: "",
   });
 
-  const onSignUpPressed = async() => {
-    
+  const onSignUpPressed = async () => {
     console.warn("sign up");
     const fnameValidation = validateFname(firstname);
     const lnameValidation = validateLname(lastname);
     const usernameValidation = validateUsername(username);
     const emailValidation = validateEmail(email);
     const passwordValidation = validatePassword(password);
-    const confirmpasswordValidation = validateConfirmpassword(password,passwordRepeat);
+    const confirmpasswordValidation = validateConfirmpassword(
+      password,
+      passwordRepeat
+    );
 
-    if (!fnameValidation.isValid ||
+    if (
+      !fnameValidation.isValid ||
       !lnameValidation.isValid ||
       !usernameValidation.isValid ||
       !emailValidation.isValid ||
       !passwordValidation.isValid ||
-      !confirmpasswordValidation.isValid){
-          setFormErrors(
-            {
-            firstname: fnameValidation.Message,
-            lastname: lnameValidation.Message,
-            username: usernameValidation.Message,
-            email: emailValidation.Message,
-            password: passwordValidation.Message,
-            confirmpassword: confirmpasswordValidation.Message
-            }
-          );
-          console.warn(formErrors);
-          return;
-      }
+      !confirmpasswordValidation.isValid
+    ) {
+      setFormErrors({
+        firstname: fnameValidation.Message,
+        lastname: lnameValidation.Message,
+        username: usernameValidation.Message,
+        email: emailValidation.Message,
+        password: passwordValidation.Message,
+        confirmpassword: confirmpasswordValidation.Message,
+      });
+      console.warn(formErrors);
+      return;
+    }
 
-      try{
-        await axios.post(`${apiURL}/api/v1/auth/register`,{
-          fname: firstname,
-          lname: lastname,
-          email: email,
-          uname: username,
-          password: password,
-          confirmpassword: passwordRepeat,
-          type: userType,
-        });
-        Alert.alert("Registration Successful");
-        navigation("ConfirmEmail");
-      }catch(error){
-        Alert.alert("Something went wrong, please try again later.");
-      }
-      
-    
+    try {
+      await axios.post(`${apiURL}/api/v1/auth/register`, {
+        fname: firstname,
+        lname: lastname,
+        email: email,
+        uname: username,
+        password: password,
+        confirmpassword: passwordRepeat,
+        type: userType,
+      });
+      Alert.alert("Registration Successful");
+      navigation("ConfirmEmail");
+    } catch (error) {
+      Alert.alert("Something went wrong, please try again later.");
+    }
   };
 
   const onSignInGoogle = () => {
@@ -103,7 +104,6 @@ const SignUpScreen = () => {
   const onTermsPressed = () => {
     console.warn("terms");
     navigation.navigate("Terms");
-
   };
   const onPrivacyPressed = () => {
     console.warn("privacy");
@@ -119,8 +119,9 @@ const SignUpScreen = () => {
             value={firstname}
             setValue={setFirstname}
           />
-          {formErrors.firstname ? 
-          <Text style={styles.error}>{formErrors.firstname}</Text> : null}
+          {formErrors.firstname ? (
+            <Text style={styles.error}>{formErrors.firstname}</Text>
+          ) : null}
           <CustomInput
             placeholder="Last Name"
             value={lastname}
@@ -129,11 +130,7 @@ const SignUpScreen = () => {
           {formErrors.lastname ? (
             <Text style={styles.error}>{formErrors.lastname}</Text>
           ) : null}
-          <CustomInput 
-            placeholder="E-mail" 
-            value={email} 
-            setValue={setEmail} 
-          />
+          <CustomInput placeholder="E-mail" value={email} setValue={setEmail} />
           {formErrors.email ? (
             <Text style={styles.error}>{formErrors.email}</Text>
           ) : null}
@@ -163,11 +160,7 @@ const SignUpScreen = () => {
           {formErrors.confirmpassword ? (
             <Text style={styles.error}>{formErrors.confirmpassword}</Text>
           ) : null}
-          <CustomInput
-            value={userType}
-            setValue={setUserType}
-            hidden={true}
-          />
+          <CustomInput value={userType} setValue={setUserType} hidden={true} />
 
           <CustomButton text="Sign Up" onPress={onSignUpPressed} />
           <Text style={styles.text}>
