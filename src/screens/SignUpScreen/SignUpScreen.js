@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Config from "@/config";
 
+
 const apiURL = Config.API_BASE_URL;
 
 const SignUpScreen = () => {
@@ -88,8 +89,14 @@ const SignUpScreen = () => {
         type: userType,
       });
       Alert.alert("Registration Successful");
-      navigation("ConfirmEmail");
+      navigation.navigate("ConfirmEmail");
     } catch (error) {
+      if(error.response && error.response.data){
+        setFormErrors({
+          ...formErrors,
+          email: error.response.data
+        });
+      }
       Alert.alert("Something went wrong, please try again later.");
     }
   };
@@ -160,7 +167,7 @@ const SignUpScreen = () => {
           {formErrors.confirmpassword ? (
             <Text style={styles.error}>{formErrors.confirmpassword}</Text>
           ) : null}
-          <CustomInput value={userType} setValue={setUserType} hidden={true} />
+          <CustomInput value={userType}  editable={false}/>
 
           <CustomButton text="Sign Up" onPress={onSignUpPressed} />
           <Text style={styles.text}>
@@ -210,6 +217,11 @@ const styles = StyleSheet.create({
     color: "#FA6B6B",
     fontWeight: "bold",
   },
-});
+  error: {
+    color: "red",
+    fontSize: "10px"
+  }
+})
+;
 
 export default SignUpScreen;
