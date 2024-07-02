@@ -6,8 +6,11 @@ import {
     useWindowDimensions,
     ScrollView,
     SafeAreaView,
+    Alert,
   } from "react-native";
-  import React from "react";
+  import React, { useEffect, useState } from "react";
+  import { useNavigation, useRoute } from "@react-navigation/native";
+
  
   const  EmailVerificationScreen= () => {
     
@@ -16,7 +19,6 @@ import {
       <View>
         <SafeAreaView>
           <View style={styles.root}>
-            <Text style={styles.title}>Please Check your Email to verify your Account</Text>
           </View>
         </SafeAreaView>
       </View>
