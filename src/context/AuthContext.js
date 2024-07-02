@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
       if (error.response && error.response.data) {
         errorMessage =
           error.response.data.Message || "Invalid Email or Password";
+          Alert.alert(errorMessage);
       }
       setError({
         email: errorMessage,

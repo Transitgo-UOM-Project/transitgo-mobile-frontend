@@ -138,10 +138,10 @@ const styles = StyleSheet.create({
   },
   sec: {
     backgroundColor: "#bbdfea",
-    //shadowColor: "#abb6ba",
+    shadowColor: "#abb6ba",
     borderRadius: 3,
     elevation: 3,
-    //shadowOpacity: 1,
+    shadowOpacity: 1,
     padding: 10,
   },
   text: {
