@@ -10,6 +10,7 @@ import SignUpScreen from "../screens/SignUpScreen/Index";
 import ConfirmEmailScreen from "../screens/ConfirmEmailScreen/Index";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen/Index";
 import ResetPasswordScreen from "../screens/ResetPassword/Index";
+import EmailVerificationScreen from "../screens/EmailVerification/Index"
 import Terms from "../screens/Terms/Index"
 
 
@@ -26,6 +27,7 @@ const Authentication = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Terms" component={Terms}/>
+        <Stack.Screen name="EmailVerification" component={EmailVerificationScreen}/>
 
       </Stack.Navigator>
     

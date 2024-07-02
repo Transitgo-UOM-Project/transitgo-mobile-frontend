@@ -89,7 +89,7 @@ const SignUpScreen = () => {
         type: userType,
       });
       Alert.alert("Registration Successful");
-      navigation.navigate("ConfirmEmail");
+      navigation.navigate("EmailVerification");
     } catch (error) {
       if(error.response && error.response.data){
         setFormErrors({
