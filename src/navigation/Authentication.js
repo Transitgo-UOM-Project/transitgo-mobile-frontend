@@ -10,7 +10,10 @@ import SignUpScreen from "../screens/SignUpScreen/Index";
 import ConfirmEmailScreen from "../screens/ConfirmEmailScreen/Index";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen/Index";
 import ResetPasswordScreen from "../screens/ResetPassword/Index";
-import EmailVerificationScreen from "../screens/EmailVerification/Index"
+import EmailVerificationScreen from "../screens/EmailVerification/Index";
+import SuccessComponent from "../screens/SuccessScreen/Index";
+import FailComponent from "../screens/FailScreen/Index";
+import EmailVerificationResultScreen from "../screens/EmailVerificationResult/Index";
 import Terms from "../screens/Terms/Index"
 
 
@@ -28,6 +31,9 @@ const Authentication = () => {
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Terms" component={Terms}/>
         <Stack.Screen name="EmailVerification" component={EmailVerificationScreen}/>
+        <Stack.Screen name="verify-email" component={EmailVerificationResultScreen}/>
+        <Stack.Screen name="Success" component={SuccessComponent}/>
+        <Stack.Screen name="Fail" component={FailComponent}/>
 
       </Stack.Navigator>
     
