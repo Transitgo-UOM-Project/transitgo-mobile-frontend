@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Alert } from "react-native";
 import { validateEmail, validatePassword } from "../components/Validations";
 import Config from "@/config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const apiURL = Config.API_BASE_URL;
 
@@ -41,8 +42,19 @@ export const AuthProvider = ({ children }) => {
           password: password,
         }
       );
+
       console.log(response);
-      const { token } = response.data.token;
+      const token  = response.data.token;
+      const type = response.data.user.type;
+      const email = response.data.user.username;
+      const uname = response.data.user.uname;
+      console.log(token,type);
+
+      await AsyncStorage.setItem('token',token);
+      await AsyncStorage.setItem('role',type);
+      await AsyncStorage.setItem('email',email);
+      await AsyncStorage.setItem('uname',uname);
+
       setUserToken(token);
       setIsLoading(false);
       navigation.navigate("HomeScreen");
@@ -64,6 +76,24 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+      fetch(`${apiURL}/api/v1/auth/logout`,{
+        method: "POST",
+        headers: {
+          "content-Type" :"application/json",
+          "Authorization" : `Bearer ${AsyncStorage.getItem('token')}`
+        },
+      }).then(response => {
+        if (response.ok){
+          AsyncStorage.clear();
+          navigation.navigate("HomeScreen")
+          console.log("Logout success");
+        }else{
+          console.log("logout failed");
+        }
+      }).catch(error => {
+        console.error("Error during logout", error);
+      });
+   
     setUserToken(null);
     setIsLoading(false);
   };
