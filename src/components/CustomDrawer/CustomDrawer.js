@@ -7,9 +7,22 @@ import {
 import { FlipInEasyX } from "react-native-reanimated";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "@/src/context/AuthContext";
+import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomDrawer = (props) => {
   const {logout} = useContext(AuthContext);
+  
+  const [username, setUsername] = useState("");
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const uname = await AsyncStorage.getItem('uname');
+      setUsername(uname);
+    };
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -21,7 +34,7 @@ const CustomDrawer = (props) => {
           source={require("../../../assets/images/profile.jpeg")}
           style={styles.prof}
         />
-        <Text style={styles.text}>Semo</Text>
+        <Text style={styles.text}>{username}</Text>
         <View style={styles.list}>
           <DrawerItemList {...props} />
         </View>

@@ -6,26 +6,46 @@ import {
   useWindowDimensions,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import logo from "../../../assets/images/logo.png";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Config from "@/config";
 
-const ResetPassword = () => {
+const apiURL = Config.API_BASE_URL;
+
+const ResetPassword = ({route}) => {
   const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-
+  const email = route.params.email;
+  
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  const onConfirmPressed = () => {
-    console.warn("confirm");
+  const onConfirmPressed = async () => {
+    try{
+      const response = await axios.post(`${apiURL}/api/v1/auth/new-password`,null,{params: {email,password}});
+      const responseStatus = response.data.message;
+      console.log(responseStatus);
+      if (responseStatus === "Password Saved"){
+        Alert.alert("Password Updated");
+        navigation.navigate("SignIn");
+     }else if (responseStatus === "User does not exist"){
+        console.log("User does not exist");
+        Alert.alert("User does not exist");
+     }else{
+        console.log("Error occurred while updating password");
+        Alert.alert("Error occurred while updating password");
+     }
+    }catch(error){
+      console.log("Error updating new password", error);
+      Alert.alert("Error updating new password, Try again later")
+    }
   };
-  const onResendPressed = () => {
-    console.warn("resend");
-  };
+  
   const onSignInPressed = () => {
     console.warn("signin");
     navigation.navigate("SignIn");
@@ -48,16 +68,10 @@ const ResetPassword = () => {
           icon="lock"
         />
 
-        <Text style={styles.textt}>Confirm Password</Text>
-
-        <CustomInput
-          placeholder="Re-Enter your New Password"
-          value={newPassword}
-          setValue={setNewPassword}
-          icon="lock"
+        <CustomButton 
+        text="Save and Login" 
+        onPress={onConfirmPressed} 
         />
-
-        <CustomButton text="Save and Login" onPress={onConfirmPressed} />
 
         <CustomButton
           text="Back to Sign In"
