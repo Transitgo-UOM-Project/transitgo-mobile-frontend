@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Config from "../../../config";
-
 import {
   View,
   Text,
@@ -13,6 +11,8 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Config from "../../../config";
+
 
 const apiUrl = Config.API_BASE_URL;
 
