@@ -7,11 +7,12 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import axios from "axios"; // Import axios for HTTP requests
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
@@ -22,6 +23,19 @@ const Lost = () => {
   const [mobile_Number, setNumber] = useState("");
   const [item_Description, setDescription] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
 
   const navigation = useNavigation();
 
@@ -38,7 +52,7 @@ const Lost = () => {
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/lost`, data);
+      const response = await axios.post(`${apiUrl}/lost`, data, Authorization);
 
       console.log("POST response:", response.data);
 

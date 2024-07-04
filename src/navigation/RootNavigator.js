@@ -5,6 +5,8 @@
  import ConfirmEmailScreen from "../screens/ConfirmEmailScreen/Index";
  import SignInScreen from "../screens/SignInScreen/Index";
  import VerifyOTPScreen from "../screens/VerifyOTPScreen/Index";
+ import SignUpScreen from "../screens/SignUpScreen/Index";
+ import HomeScreen from "../screens/HomeScreen/Index";
  // Import other screens as needed
 
  const Stack = createNativeStackNavigator();
@@ -13,7 +15,7 @@
    return (
      <NavigationContainer>
        <Stack.Navigator screenOptions={{ headerShown: false }}>
-         <Stack.Screen name="StartScreen" component={StartScreen} />
+         <Stack.Screen name="SignUp" component={SignUpScreen} />
          <Stack.Screen name="Main" component={Draw} />
          <Stack.Screen name="ConfirmEmail" component={ConfirmEmailScreen} />
          <Stack.Screen name="SignIn" component={SignInScreen} />
@@ -21,6 +23,7 @@
          <Stack.Screen name="ResetPassword" component={ResetPassword} />
          <Stack.Screen name="VerifyPassword" component={VerifyPasswordScreen}/>
          <Stack.Screen name="Tracking" component={Tracking}/>
+         <Stack.Screen name="ActivityHistory" component={ActivityHistoryScreen}/>
          {/* Add other screens as needed */}
        </Stack.Navigator>
      </NavigationContainer>

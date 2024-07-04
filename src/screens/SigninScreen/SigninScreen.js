@@ -28,7 +28,7 @@ const SigninScreen = () => {
 
   const onForgotPasswordPressed = () => {
     console.warn("forgot password");
-    navigation.navigate('ForgotPassword')
+    navigation.navigate('ConfirmEmail')
   };
 
   const onSignInGoogle = () => {

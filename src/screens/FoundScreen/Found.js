@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import CustomButton from "@/src/components/CustomButton/Index";
 import axios from "axios"; // Import axios for HTTP requests
 import { useNavigation } from "@react-navigation/native";
 import Config from "../../../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const apiUrl = Config.API_BASE_URL;
 
 const Found = () => {
@@ -20,6 +21,19 @@ const Found = () => {
   const [mobile_Number, setNumber] = useState("");
   const [item_Description, setDescription] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
 
   const navigation = useNavigation();
 
@@ -36,7 +50,7 @@ const Found = () => {
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/found`, data);
+      const response = await axios.post(`${apiUrl}/found`, data, Authorization);
 
       console.log("POST response:", response.data);
 

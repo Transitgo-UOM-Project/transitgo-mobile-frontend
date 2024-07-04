@@ -6,6 +6,7 @@ import {validateEmail, validatePassword} from '../components/Validations';
 import Config from '@/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const apiURL = Config.API_BASE_URL;
 
 export const AuthContext = createContext();
@@ -44,60 +45,65 @@ export const AuthProvider = ({children}) => {
       );
 
       console.log(response);
-      const token = response.data.token;
-      const type = response.data.user.type;
-      const email = response.data.user.username;
-      const uname = response.data.user.uname;
-      console.log(token, type);
 
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('role', type);
-      await AsyncStorage.setItem('email', email);
-      await AsyncStorage.setItem('uname', uname);
+      const { token, user } = response.data;
+      const { type, username: email, uname, id } = user;
+
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("role", type);
+      await AsyncStorage.setItem("email", email);
+      await AsyncStorage.setItem("uname", uname);
+      await AsyncStorage.setItem("id", id);
 
       setUserToken(token);
       setIsLoading(false);
-      // navigation.navigate("HomeScreen");
+      
+    
+
     } catch (error) {
       let errorMessage = 'Something went wrong! Please try again later';
       if (error.response && error.response.data) {
-        errorMessage =
-          error.response.data.Message || 'Invalid Email or Password';
-        Alert.alert(errorMessage);
+
+        errorMessage = error.response.data.Message || "Invalid Email or Password";
+
       }
       setError({
         email: errorMessage,
         password: errorMessage,
       });
-      console.error('Login Failed', errorMessage);
+
       Alert.alert(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    fetch(`${apiURL}/api/v1/auth/logout`, {
-      method: 'POST',
-      headers: {
-        'content-Type': 'application/json',
-        Authorization: `Bearer ${AsyncStorage.getItem('token')}`,
-      },
-    })
-      .then(response => {
-        if (response.ok) {
-          AsyncStorage.clear();
-          navigation.navigate('HomeScreen');
-          console.log('Logout success');
-        } else {
-          console.log('logout failed');
-        }
-      })
-      .catch(error => {
-        console.error('Error during logout', error);
-      });
 
-    setUserToken(null);
-    setIsLoading(false);
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch(`${apiURL}/api/v1/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        await AsyncStorage.clear();
+        navigation.navigate("LoginScreen");
+        console.log("Logout success");
+      } else {
+        console.log("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout", error);
+    } finally {
+      setUserToken(null);
+      setIsLoading(false);
+    }
+
   };
 
   return (
