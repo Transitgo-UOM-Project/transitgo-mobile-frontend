@@ -21,6 +21,19 @@ const FoundItemScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigation = useNavigation();
 
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
+
   useEffect(() => {
     fetchFoundItems();
   }, []);
@@ -51,7 +64,7 @@ const FoundItemScreen = () => {
   const handleDelete = (item) => {
     fetch(`${apiUrl}/found/${item.id}`, {
       method: "DELETE",
-    })
+    },Authorization)
       .then((response) => {
         if (response.ok) {
           setFoundItems(

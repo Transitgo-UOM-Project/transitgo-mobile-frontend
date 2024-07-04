@@ -25,6 +25,19 @@ const LostItemScreen = () => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
+
   useEffect(() => {
     fetchLostItems();
   }, []);
@@ -56,7 +69,7 @@ const LostItemScreen = () => {
   const handleDelete = (item) => {
     fetch(`${apiUrl}/lost/${item.id}`, {
       method: "DELETE",
-    })
+    },Authorization)
       .then((response) => {
         if (response.ok) {
           setLostItems(lostItems.filter((lostItem) => lostItem.id !== item.id));

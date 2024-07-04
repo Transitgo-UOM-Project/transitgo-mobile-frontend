@@ -48,16 +48,17 @@ export const AuthProvider = ({ children }) => {
       const type = response.data.user.type;
       const email = response.data.user.username;
       const uname = response.data.user.uname;
-      console.log(token,type);
-
+      const id = response.data.uname.id;
+      
       await AsyncStorage.setItem('token',token);
       await AsyncStorage.setItem('role',type);
       await AsyncStorage.setItem('email',email);
       await AsyncStorage.setItem('uname',uname);
+      await AsyncStorage.setItem('id',id);
 
-      setUserToken(token);
-      setIsLoading(false);
-      navigation.navigate("HomeScreen");
+      if(response.status === 200){
+        navigation.navigate("HomeScreen");
+      }
     } catch (error) {
       let errorMessage = "Something went wrong! Please try again later";
       if (error.response && error.response.data) {

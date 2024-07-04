@@ -8,6 +8,7 @@ import MassegesScreen from "../screens/MassegesScreen";
 import CustomDrawer from "../components/CustomDrawer";
 import BottomTab from "./BottomTab";
 import Tracking from "../screens/TrackingScreen/Tracking";
+import ActivityHistoryScreen from "../screens/ActivityHistoryScreen/ActivityHistoryScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -28,12 +29,12 @@ const Draw = () => {
   }, []);
 
   const getPackageStatusComponent = () => {
-    if (userRole === 'pasenger') {
-      return Tracking; // or some other screen for admins
-    } else if (userRole === 'employee') {
-      return Tracking; // or some other screen for regular users
+    if (userRole === 'employee') {
+      return Tracking; 
+    } else{
+      return Tracking; 
     }
-    return Tracking; // default screen if role is undefined
+    
   };
 
   return (
@@ -75,7 +76,7 @@ const Draw = () => {
       />
       <Drawer.Screen
         name="Activity History"
-        component={MassegesScreen}
+        component={ActivityHistoryScreen}
         options={{
           drawerIcon: ({ color }) => (
             <Ionicons name="chatbox-ellipses-outline" size={20} color={color} />

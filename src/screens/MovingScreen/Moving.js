@@ -32,6 +32,19 @@ const Moving = () => {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const navigation = useNavigation();
 
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
+
   useEffect(() => {
     if (submitAttempted) {
       validateForm();
@@ -101,7 +114,7 @@ const Moving = () => {
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/package`, pack);
+      const response = await axios.post(`${apiUrl}/package`, pack, Authorization);
       if (response.status === 200) {
         Alert.alert("Success", "Booking confirmed!");
         navigation.navigate("PackageScreen");

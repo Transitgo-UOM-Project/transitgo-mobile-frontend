@@ -23,6 +23,19 @@ const Lost = () => {
   const [item_Description, setDescription] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
+
   const navigation = useNavigation();
 
   const postedOn = new Date().toISOString(); // Define postedOn with the current date and time
@@ -38,7 +51,7 @@ const Lost = () => {
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/lost`, data);
+      const response = await axios.post(`${apiUrl}/lost`, data, Authorization);
 
       console.log("POST response:", response.data);
 
