@@ -10,16 +10,22 @@ import {
 } from "react-native";
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from "@react-navigation/native";
+import {useRoute,  useNavigation } from "@react-navigation/native";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
 
 const FoundItemScreen = () => {
+
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { list } = route.params || {};
+
+  
   const [foundItems, setFoundItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const navigation = useNavigation();
+  
 
   useEffect(() => {
     fetchFoundItems();
@@ -30,6 +36,7 @@ const FoundItemScreen = () => {
       .then((response) => response.json())
       .then((data) => {
         setFoundItems(data);
+        setFilteredItems(data);
       })
       .catch((error) => {
         console.error("Error fetching found items:", error);
