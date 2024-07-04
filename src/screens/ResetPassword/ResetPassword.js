@@ -16,11 +16,12 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Config from "@/config";
 
+
 const apiURL = Config.API_BASE_URL;
 
 const ResetPassword = ({route}) => {
   const [password, setPassword] = useState("");
-  const email = route.params.email;
+  const email  = route.params.email;
   
   const { height } = useWindowDimensions();
   const navigation = useNavigation();

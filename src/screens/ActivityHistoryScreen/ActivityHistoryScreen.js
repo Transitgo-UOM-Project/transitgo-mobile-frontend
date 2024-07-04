@@ -17,6 +17,7 @@ import axios from "axios";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
 
+
 const apiUrl = Config.API_BASE_URL;
 
 const ActivityHistoryScreen = () => {
@@ -149,25 +150,12 @@ const ActivityHistoryScreen = () => {
     }
   };
 
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    const filteredData = activityLog.filter(
-      (activity) =>
-        activity.description.toLowerCase().includes(text.toLowerCase())
-    );
-    setActivityLog(filteredData);
-  };
+ 
 
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <View style={styles.pad}>
-          <CustomBlue
-            placeholder="Search..."
-            icon="search"
-            onChangeText={handleSearch}
-            value={searchQuery}
-          />
           {activityLog.length > 0 ? activityLog.map((activity) => (
             <View key={activity.activityId} style={styles.itemContainer}>
               <Text style={styles.label}>

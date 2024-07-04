@@ -12,7 +12,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Config from "../../../config";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const apiUrl = Config.API_BASE_URL;
 
