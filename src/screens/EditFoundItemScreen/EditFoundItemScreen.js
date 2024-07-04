@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
@@ -17,6 +18,19 @@ const EditFoundItemScreen = () => {
   const [mobileNumber, setMobileNumber] = useState(item.mobile_Number);
   const [itemDescription, setItemDescription] = useState(item.item_Description);
 
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
+
   const handleSave = async () => {
     const updatedItem = {
       ...item,
@@ -29,7 +43,8 @@ const EditFoundItemScreen = () => {
     try {
       const response = await axios.put(
         `${apiUrl}/found/${item.id}`,
-        updatedItem
+        updatedItem,
+        Authorization
       );
       console.log("Item updated:", response.data);
 

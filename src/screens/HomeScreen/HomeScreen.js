@@ -14,6 +14,7 @@ import logo from "../../../assets/SmallImage/logo.png";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+
 const HomeScreen = () => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();

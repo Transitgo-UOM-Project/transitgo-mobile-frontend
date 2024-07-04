@@ -10,6 +10,7 @@ import CustomCard from "../../components/CustomCard/Index";
 import logo from "../../../assets/SmallImage/logo.png";
 import { useNavigation } from "@react-navigation/native";
 
+
 const LostFoundScreen = () => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();

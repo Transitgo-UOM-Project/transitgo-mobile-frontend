@@ -11,9 +11,14 @@ import VerifyOTPScreen from "../screens/VerifyOTPScreen/Index";
 import ResetPassword from "../screens/ResetPassword/Index";
 import VerifyPasswordScreen from "../screens/VerifyPassword/Index";
 import Tracking from "../screens/TrackingScreen/Index";
+import SignUpScreen from "../screens/SignUpScreen/Index";
+import ActivityHistoryScreen from "../screens/ActivityHistoryScreen/Index";
+import HomeScreen from "../screens/HomeScreen/Index";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 // Import other screens as needed
 
 const Stack = createNativeStackNavigator();
+
 
 const AppMain = () => {
   const { isLoading, userToken } = useContext(AuthContext);
@@ -32,15 +37,18 @@ const AppMain = () => {
         {userToken !== null ? (
           <>
             <Stack.Screen name="Main" component={Draw} />
+            <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="ConfirmEmail" component={ConfirmEmailScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
             <Stack.Screen name="VerifyPassword" component={VerifyPasswordScreen}/>
             <Stack.Screen name="Tracking" component={Tracking}/>
+            <Stack.Screen name="ActivityHistory" component={ActivityHistoryScreen}/>
           </>
         ) : (
           <>
+          
             <Stack.Screen name="Authentication" component={Authentication} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="ConfirmEmail" component={ConfirmEmailScreen} />

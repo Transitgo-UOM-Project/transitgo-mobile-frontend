@@ -11,6 +11,7 @@ import {
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {useRoute,  useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
@@ -26,6 +27,19 @@ const FoundItemScreen = () => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   
+
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     fetchFoundItems();
@@ -58,7 +72,7 @@ const FoundItemScreen = () => {
   const handleDelete = (item) => {
     fetch(`${apiUrl}/found/${item.id}`, {
       method: "DELETE",
-    })
+    },Authorization)
       .then((response) => {
         if (response.ok) {
           setFoundItems(

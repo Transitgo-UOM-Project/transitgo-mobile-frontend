@@ -14,6 +14,7 @@ import PickerStops from "../../components/PickerStops/Index";
 import PickerBuses from "../../components/PickerBuses/Index";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
@@ -31,6 +32,19 @@ const Moving = () => {
   const [errors, setErrors] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const navigation = useNavigation();
+
+  const [token, setToken] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setToken(token);
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (submitAttempted) {
@@ -101,7 +115,7 @@ const Moving = () => {
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/package`, pack);
+      const response = await axios.post(`${apiUrl}/package`, pack, Authorization);
       if (response.status === 200) {
         Alert.alert("Success", "Booking confirmed!");
         navigation.navigate("PackageScreen");

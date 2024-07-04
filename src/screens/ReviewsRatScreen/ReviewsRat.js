@@ -11,6 +11,7 @@ import axios from "axios";
 import { Rating, AirbnbRating } from "react-native-ratings";
 import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/Header/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Config from "../../../config";

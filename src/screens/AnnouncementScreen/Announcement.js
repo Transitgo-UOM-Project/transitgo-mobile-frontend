@@ -13,6 +13,7 @@ import CustomInput from "@/src/components/CustomInput/Index";
 import CustomButton from "@/src/components/CustomButton/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Config from "../../../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const apiUrl = Config.API_BASE_URL;
 
@@ -20,6 +21,25 @@ const Announcement = () => {
   const [ann, setAnn] = useState("");
   const [annlist, setAnnlist] = useState([]);
   const [editlist, setEditlist] = useState(null);
+
+  const [token, setToken] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
+  const Authorization = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const email = await AsyncStorage.getItem('email');
+      const role = await AsyncStorage.getItem('role');
+      setToken(token);
+      setEmail(email);
+      setRole(role);
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     fetchAnnouncements();
@@ -41,7 +61,7 @@ const Announcement = () => {
     try {
       const response = await axios.post(`${apiUrl}/announcement`, {
         details: ann,
-      });
+      }, Authorization);
       setAnnlist([...annlist, response.data]);
       setAnn("");
     } catch (error) {
@@ -58,7 +78,7 @@ const Announcement = () => {
     try {
       await axios.put(`${apiUrl}/announcement/${editlist.id}`, {
         details: ann,
-      });
+      }, Authorization);
       const updatedAnn = annlist.map((item) => {
         if (item.id === editlist.id) {
           return { ...item, details: ann };
@@ -75,7 +95,7 @@ const Announcement = () => {
 
   const onDelete = async (id) => {
     try {
-      await axios.delete(`${apiUrl}/announcement/${id}`);
+      await axios.delete(`${apiUrl}/announcement/${id}`,Authorization);
       const updatedDelete = annlist.filter((ann) => ann.id !== id);
       setAnnlist(updatedDelete);
       Alert.alert("Announcement deleted successfully.");
