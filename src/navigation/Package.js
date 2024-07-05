@@ -6,7 +6,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import PackageScreen from '../screens/PackageScreen/Index';
 import MovingScreen from '../screens/MovingScreen/Index';
 import TrackingScreen from '../screens/TrackingScreen/Index';
-import FormConductor from '../screens/FormConductor/Index';
+import FormConductor from '../screens/FormConductor/index';
 
 const Stack = createNativeStackNavigator();
 

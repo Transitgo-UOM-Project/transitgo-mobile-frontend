@@ -24,27 +24,36 @@ const LostItemScreen = () => {
   const [lostItems, setLostItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [token, setToken] = useState('');
-  const Authorization = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      setToken(token);
+    const fetchTokenAndData = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          setToken(token);
+          fetchLostItems(token);
+        } else {
+          // Handle case where token is not available
+          Alert.alert("No token found, please login again");
+        }
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
     };
-    fetchData();
+    fetchTokenAndData();
   }, []);
 
-  useEffect(() => {
-    fetchLostItems();
-  }, []);
-
-  const fetchLostItems = () => {
-    fetch(`${apiUrl}/losts`)
-      .then((response) => response.json())
+  const fetchLostItems = (token) => {
+    fetch(`${apiUrl}/losts`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then((data) => {
         setLostItems(data);
         setFilteredItems(data);
@@ -69,13 +78,12 @@ const LostItemScreen = () => {
   const handleDelete = (item) => {
     fetch(`${apiUrl}/lost/${item.id}`, {
       method: "DELETE",
-    },Authorization)
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then((response) => {
         if (response.ok) {
-          setLostItems(lostItems.filter((lostItem) => lostItem.id !== item.id));
-          setFilteredItems(
-            filteredItems.filter((lostItem) => lostItem.id !== item.id)
-          );
+          setLostItems((prevItems) => prevItems.filter((lostItem) => lostItem.id !== item.id));
+          setFilteredItems((prevItems) => prevItems.filter((lostItem) => lostItem.id !== item.id));
           Alert.alert("Item Deleted Successfully");
         } else {
           throw new Error("Failed to delete item");
@@ -90,7 +98,7 @@ const LostItemScreen = () => {
   const handleEdit = (item) => {
     navigation.navigate("EditLostItemScreen", {
       item,
-      updateLostItems: fetchLostItems,
+      updateLostItems: () => fetchLostItems(token),
     });
   };
 
