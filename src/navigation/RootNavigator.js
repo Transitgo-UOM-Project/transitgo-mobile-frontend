@@ -7,6 +7,7 @@
  import VerifyOTPScreen from "../screens/VerifyOTPScreen/Index";
  import SignUpScreen from "../screens/SignUpScreen/Index";
  import HomeScreen from "../screens/HomeScreen/Index";
+ import FormConductor from "../screens/FormConductor";
  // Import other screens as needed
 
  const Stack = createNativeStackNavigator();
@@ -24,6 +25,7 @@
          <Stack.Screen name="VerifyPassword" component={VerifyPasswordScreen}/>
          <Stack.Screen name="Tracking" component={Tracking}/>
          <Stack.Screen name="ActivityHistory" component={ActivityHistoryScreen}/>
+         <Stack.Screen name="FormConductor" component={FormConductor}/>
          {/* Add other screens as needed */}
        </Stack.Navigator>
      </NavigationContainer>

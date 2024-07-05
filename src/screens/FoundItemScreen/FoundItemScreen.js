@@ -10,44 +10,50 @@ import {
 } from "react-native";
 import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
-import {useRoute,  useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
 
 const FoundItemScreen = () => {
-
   const route = useRoute();
   const navigation = useNavigation();
   const { list } = route.params || {};
 
-  
   const [foundItems, setFoundItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
-
-  const [token, setToken] = useState('');
-  const Authorization = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
+  const [token, setToken] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      setToken(token);
+    const fetchTokenAndData = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+          setToken(token);
+          fetchFoundItems(token);
+        } else {
+          // Handle case where token is not available
+          Alert.alert("No token found, please login again");
+        }
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
     };
-    fetchData();
+    fetchTokenAndData();
   }, []);
 
-  useEffect(() => {
-    fetchFoundItems();
-  }, []);
-
-  const fetchFoundItems = () => {
-    fetch(`${apiUrl}/founds`)
-      .then((response) => response.json())
+  const fetchFoundItems = (token) => {
+    fetch(`${apiUrl}/founds`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((data) => {
         setFoundItems(data);
         setFilteredItems(data);
@@ -72,11 +78,15 @@ const FoundItemScreen = () => {
   const handleDelete = (item) => {
     fetch(`${apiUrl}/found/${item.id}`, {
       method: "DELETE",
-    },Authorization)
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((response) => {
         if (response.ok) {
-          setFoundItems(
-            foundItems.filter((foundItem) => foundItem.id !== item.id)
+          setFoundItems((prevItems) =>
+            prevItems.filter((foundItem) => foundItem.id !== item.id)
+          );
+          setFilteredItems((prevItems) =>
+            prevItems.filter((foundItem) => foundItem.id !== item.id)
           );
           Alert.alert("Item Deleted Successfully");
         } else {
@@ -92,9 +102,10 @@ const FoundItemScreen = () => {
   const handleEdit = (item) => {
     navigation.navigate("EditFoundItemScreen", {
       item,
-      updateFoundItems: fetchFoundItems, // Pass the function that refreshes the found items list
+      updateFoundItems: () => fetchFoundItems(token), // Pass the function that refreshes the found items list
     });
   };
+
   const handleSearch = (text) => {
     setSearchQuery(text);
     const filteredData = foundItems.filter(

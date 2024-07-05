@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
+import CustomInputProfile from "@/src/components/CustomInputProfile/CustomInputProfile";
 
 
 const apiUrl = Config.API_BASE_URL;
@@ -120,8 +121,8 @@ const ActivityHistoryScreen = () => {
         await axios.put(`${apiUrl}/found/${activity.activityId}`, updatedLostFound, {
           headers: { Authorization: `Bearer ${token}` },
         });
-      } else if (type === "Package") {
-        await axios.put(`${apiUrl}/package/${activity.activityId}`, {
+      } else if (type === "Announcement") {
+        await axios.put(`${apiUrl}/announcement/${activity.activityId}`, {
           details: editDescription
         }, {
           headers: { Authorization: `Bearer ${token}` },
@@ -167,7 +168,7 @@ const ActivityHistoryScreen = () => {
                 )}
               </Text>
               {isEditing === activity.activityId ? (
-                <CustomInput
+                <CustomInputProfile
                   value={editDescription}
                   onChangeText={(text) => setEditDescription(text)}
                 />

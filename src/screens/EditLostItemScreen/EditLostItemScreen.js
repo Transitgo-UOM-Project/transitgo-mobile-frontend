@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -19,9 +19,6 @@ const EditLostItemScreen = () => {
   const [itemDescription, setItemDescription] = useState(item.item_Description);
 
   const [token, setToken] = useState('');
-  const Authorization = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +41,9 @@ const EditLostItemScreen = () => {
       const response = await axios.put(
         `${apiUrl}/lost/${item.id}`,
         updatedItem,
-        Authorization
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
       console.log("Item updated:", response.data);
 
