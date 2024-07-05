@@ -10,14 +10,10 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import CustomInput from "../../components/CustomInput/CustomInput";
-import CustomButton from "../../components/CustomButton/CustomButton";
-import CustomInputProfile from "@/src/components/CustomInputProfile/CustomInputProfile";
-
+import CustomInputProfile from "../../components/CustomInputProfile/CustomInputProfile";
 
 const apiUrl = Config.API_BASE_URL;
 
@@ -26,15 +22,14 @@ const ActivityHistoryScreen = () => {
   const [id, setId] = useState("");
   const [activityLog, setActivityLog] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
-  const [editDescription, setEditDescription] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [editDescription, setEditDescription] = useState("");
   const navigation = useNavigation();
 
   useEffect(() => {
     const getStoredDetails = async () => {
       try {
-        const storedToken = await AsyncStorage.getItem('token');
-        const storedId = await AsyncStorage.getItem('id');
+        const storedToken = await AsyncStorage.getItem("token");
+        const storedId = await AsyncStorage.getItem("id");
         setToken(storedToken);
         setId(storedId);
       } catch (error) {
@@ -104,7 +99,7 @@ const ActivityHistoryScreen = () => {
         const updatedLostFound = {
           ...itemResponse.data,
           item_Description: editDescription,
-          dateTime: itemResponse.data.dateTime || new Date().toISOString()
+          dateTime: itemResponse.data.dateTime || new Date().toISOString(),
         };
         await axios.put(`${apiUrl}/lost/${activity.activityId}`, updatedLostFound, {
           headers: { Authorization: `Bearer ${token}` },
@@ -116,17 +111,21 @@ const ActivityHistoryScreen = () => {
         const updatedLostFound = {
           ...itemResponse.data,
           item_Description: editDescription,
-          dateTime: itemResponse.data.dateTime || new Date().toISOString()
+          dateTime: itemResponse.data.dateTime || new Date().toISOString(),
         };
         await axios.put(`${apiUrl}/found/${activity.activityId}`, updatedLostFound, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else if (type === "Announcement") {
-        await axios.put(`${apiUrl}/announcement/${activity.activityId}`, {
-          details: editDescription
-        }, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.put(
+          `${apiUrl}/announcement/${activity.activityId}`,
+          {
+            details: editDescription,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       } else {
         console.warn("No Response Found");
       }
@@ -140,83 +139,89 @@ const ActivityHistoryScreen = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Booked':
-        return 'red';
-      case 'Received':
-        return 'blue';
-      case 'Completed':
-        return 'green';
+      case "Booked":
+        return "red";
+      case "Received":
+        return "blue";
+      case "Completed":
+        return "green";
       default:
-        return '#000';
+        return "#000";
     }
   };
-
- 
 
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <View style={styles.pad}>
-          {activityLog.length > 0 ? activityLog.map((activity) => (
-            <View key={activity.activityId} style={styles.itemContainer}>
-              <Text style={styles.label}>
-                {activity.activityType}
-                {activity.activityType === "Package" && (
-                  <Text style={styles.label}>
-                    - {activity.activityId}
+          {activityLog.length > 0 ? (
+            activityLog.map((activity) => (
+              <View key={activity.activityId} style={styles.itemContainer}>
+                <Text style={styles.label}>
+                  {activity.activityType}
+                  {activity.activityType === "Package" && (
+                    <Text style={styles.label}> - {activity.activityId}</Text>
+                  )}
+                </Text>
+                {isEditing === activity.activityId ? (
+                  <CustomInputProfile
+                    value={editDescription}
+                    onChangeText={(text) => setEditDescription(text)}
+                  />
+                ) : (
+                  <Text style={styles.value}>
+                    {activity.description} <br /> {activity.info}
                   </Text>
                 )}
-              </Text>
-              {isEditing === activity.activityId ? (
-                <CustomInputProfile
-                  value={editDescription}
-                  onChangeText={(text) => setEditDescription(text)}
-                />
-              ) : (
-                <Text style={styles.value}>
-                  {activity.description} <br /> {activity.info}
+                <Text style={styles.labelred}>
+                  Posted On:{" "}
+                  <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
                 </Text>
-              )}
-              <Text style={styles.labelred}>
-                Posted On: <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
-              </Text>
-              <View style={styles.card}>
-                {activity.activityType !== "Package" ? (
-                  <>
-                    <TouchableOpacity onPress={() => handleDelete(activity.activityType, activity.activityId)}>
-                      <View style={styles.icon}>
-                        <Icon name="trash" size={15} color="#132968" />
-                      </View>
-                    </TouchableOpacity>
-                    {isEditing === activity.activityId ? (
-                      <TouchableOpacity onPress={() => handleSaveEdit(activity)}>
+                <View style={styles.card}>
+                  {activity.activityType !== "Package" ? (
+                    <>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleDelete(activity.activityType, activity.activityId)
+                        }
+                      >
                         <View style={styles.icon}>
-                          <Text>Save</Text>
+                          <Icon name="trash" size={15} color="#132968" />
                         </View>
                       </TouchableOpacity>
-                    ) : (
-                      <TouchableOpacity onPress={() => handleEditClick(activity)}>
-                        <View style={styles.icon}>
-                          <Icon name="pencil" size={15} color="#132968" />
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                ) : (
-                  <CustomButton
-                    style={{
-                      ...styles.btn,
-                      backgroundColor: getStatusColor(activity.pacStatus)
-                    }}
-                    text={activity.pacStatus}
-                  />
-                )}
+                      {isEditing === activity.activityId ? (
+                        <TouchableOpacity onPress={() => handleSaveEdit(activity)}>
+                          <View style={styles.icon}>
+                            <Text>Save</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => handleEditClick(activity)}
+                        >
+                          <View style={styles.icon}>
+                            <Icon name="pencil" size={15} color="#132968" />
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </>
+                  ) : (
+                    <View
+                      style={{
+                        ...styles.statusButton,
+                        backgroundColor: getStatusColor(activity.pacStatus),
+                      }}
+                    >
+                      <Text style={styles.statusButtonText}>
+                        {activity.pacStatus}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-          )) : (
-            <Text style={styles.no}>
-              No Activity Found
-            </Text>
+            ))
+          ) : (
+            <Text style={styles.no}>No Activity Found</Text>
           )}
         </View>
       </SafeAreaView>
@@ -269,25 +274,20 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
-  btn: {
-    color: "white",
-    padding: "4px",
-    borderRadius: "5px",
-    fontSize: "1rem",
-    display: "inline-flex",
+  statusButton: {
+    padding: 8,
+    borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    cursor: "pointer",
-    margin: "4px",
-    textAlign: "center",
-    minWidth: "50px",
-    height: "30px",
-    lineHeight: "normal",
+  },
+  statusButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   no: {
-    textAlign: 'center',
-    fontSize: '2rem',
-    opacity: '0.5',
+    textAlign: "center",
+    fontSize: "2rem",
+    opacity: "0.5",
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 
 function FormConductor() {
   const [pack, setPack] = useState({
@@ -20,31 +20,38 @@ function FormConductor() {
   });
 
   const [pacDet, setPacDet] = useState([]);
-  const token = AsyncStorage.getItem('token');
-  const id = AsyncStorage.getItem('id');
-  const Authorization = {
-    headers: {Authorization: `Bearer ${token}`},
-  };
+  const [token, setToken] = useState('');
+  const [id, setId] = useState('');
 
   useEffect(() => {
-    loadPackageDetails();
-  }, []);
+    const loadTokenAndId = async () => {
+      const storedToken = await AsyncStorage.getItem('token');
+      const storedId = await AsyncStorage.getItem('id');
+      setToken(storedToken);
+      setId(storedId);
+    };
 
-  const {packageID, status} = pack;
+    loadTokenAndId().then(() => {
+      if (token && id) {
+        loadPackageDetails();
+      }
+    });
+  }, [token, id]);
+
+  const { packageID, status } = pack;
 
   const onInputChange = (key, value) => {
-    setPack({...pack, [key]: value});
+    setPack({ ...pack, [key]: value });
   };
 
   const loadPackageDetails = async () => {
     try {
-      const packages = await axios.get(
-        'http://localhost:8080/packages',
-        Authorization,
-      );
+      const packages = await axios.get('http://localhost:8080/packages', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const packageArray = packages.data || [];
       const filteredPackages = packageArray.filter(
-        pac => String(pac.employeeId) === String(id),
+        (pac) => String(pac.employeeId) === String(id)
       );
       setPacDet(filteredPackages);
     } catch (error) {
@@ -54,18 +61,17 @@ function FormConductor() {
 
   const onSubmitPack = async () => {
     try {
-      const response = await axios.put(
-        `http://localhost:8080/package/${packageID}`,
-        pack,
-        Authorization,
-      );
+      const response = await axios.put(`http://localhost:8080/package/${packageID}`, pack, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(response);
       setPack({
-        packageID: '',
-        status: '',
+        packageID: "",
+        status: "",
       });
       loadPackageDetails();
     } catch (error) {
-      Alert.alert('Package is not available');
+      Alert.alert('Package is not available', error.message);
     }
   };
 
@@ -76,7 +82,7 @@ function FormConductor() {
     });
   };
 
-  const getStatusColor = status => {
+  const getStatusColor = (status) => {
     switch (status) {
       case 'Booked':
         return 'red';
@@ -95,13 +101,14 @@ function FormConductor() {
       <TextInput
         style={styles.input}
         placeholder="Package ID"
-        value={pack.packageID}
+        value={packageID}
         editable={false}
       />
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={pack.status}
-          onValueChange={itemValue => onInputChange('status', itemValue)}>
+          selectedValue={status}
+          onValueChange={(itemValue) => onInputChange('status', itemValue)}
+        >
           <Picker.Item label="Received" value="Received" />
           <Picker.Item label="Completed" value="Completed" />
         </Picker>
@@ -112,7 +119,7 @@ function FormConductor() {
       </View>
       <View style={styles.packageList}>
         {pacDet.length > 0 ? (
-          pacDet.map(pac => (
+          pacDet.map((pac) => (
             <TouchableOpacity
               key={pac.packageID}
               style={styles.packageItem}
@@ -121,22 +128,22 @@ function FormConductor() {
                   packageID: pac.packageID,
                   status: pac.status,
                 })
-              }>
-              <Text style={styles.packageText}>
-                Package ID: {pac.packageID}
-              </Text>
+              }
+            >
+              <Text style={styles.packageText}>Package ID: {pac.packageID}</Text>
               <Text style={styles.packageText}>
                 {pac.start} - {pac.destination}
               </Text>
               <Text style={styles.packageText}>{pac.receiverName}</Text>
-              <Text style={[styles.packageText, {color: '#FA6B6B'}]}>
+              <Text style={[styles.packageText, { color: '#FA6B6B' }]}>
                 {pac.receiverContact}
               </Text>
               <Text
                 style={[
                   styles.packageText,
-                  {backgroundColor: getStatusColor(pac.status), color: 'white'},
-                ]}>
+                  { backgroundColor: getStatusColor(pac.status), color: 'white' },
+                ]}
+              >
                 {pac.status}
               </Text>
             </TouchableOpacity>
