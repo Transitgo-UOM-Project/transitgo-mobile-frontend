@@ -1,7 +1,7 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
-import React from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
-import Fontisto from "react-native-vector-icons/FontAwesome";
+import {View, Text, TextInput, StyleSheet} from 'react-native';
+import React from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Fontisto from 'react-native-vector-icons/FontAwesome';
 
 const CustomInput = ({
   value,
@@ -9,7 +9,8 @@ const CustomInput = ({
   placeholder,
   secureTextEntry,
   icon,
- 
+  editable,
+  onChangeText,
 }) => {
   return (
     <View style={[styles.container]}>
@@ -21,7 +22,7 @@ const CustomInput = ({
         style={styles.input}
         placeholderTextColor="#999999"
         secureTextEntry={secureTextEntry}
-        
+        editable={editable}
       />
     </View>
   );
@@ -29,13 +30,13 @@ const CustomInput = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    width: "100%",
-    borderColor: "#808080",
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    borderColor: '#808080',
     borderRadius: 5,
     padding: 20,
     marginVertical: 6,
-    flexDirection: "row",
+    flexDirection: 'row',
     marginVertical: 6,
   },
   input: {
