@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import MassegesScreen from "../screens/MassegesScreen";
@@ -13,12 +13,12 @@ import ActivityHistoryScreen from "../screens/ActivityHistoryScreen/ActivityHist
 const Drawer = createDrawerNavigator();
 
 const Draw = () => {
- const [userRole, setUserRole] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     const getUserRole = async () => {
       try {
-        const role = await AsyncStorage.getItem('userRole'); 
+        const role = await AsyncStorage.getItem("userRole");
         setUserRole(role);
       } catch (error) {
         console.error("Failed to fetch user role:", error);
@@ -29,12 +29,11 @@ const Draw = () => {
   }, []);
 
   const getPackageStatusComponent = () => {
-    if (userRole === 'employee') {
-      return Tracking; 
-    } else{
-      return Tracking; 
+    if (userRole === "employee") {
+      return Tracking;
+    } else {
+      return Tracking;
     }
-    
   };
 
   return (
@@ -42,8 +41,8 @@ const Draw = () => {
       screenOptions={{
         headerShown: false,
         drawerLabelStyle: { marginLeft: -20, fontSize: 15 },
-        drawerActiveBackgroundColor:"#FA6B6B",
-        drawerActiveTintColor:"white",
+        drawerActiveBackgroundColor: "#FA6B6B",
+        drawerActiveTintColor: "white",
       }}
       drawerContent={(props) => <CustomDrawer {...props} />}
     >
