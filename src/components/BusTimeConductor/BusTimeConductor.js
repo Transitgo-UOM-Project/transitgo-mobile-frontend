@@ -1,22 +1,23 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
+  Modal,
   ScrollView,
   Dimensions,
-  Picker,
-  Modal,
-} from 'react-native';
-import axios from 'axios';
-import CustomButton from '../CustomButton/CustomButton';
-import {useNavigation} from '@react-navigation/native';
-import Config from '../../../config';
-
+} from "react-native";
+import axios from "axios";
+import CustomButton from "../CustomButton/CustomButton";
+import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from "expo-location";
 const apiUrl = Config.API_BASE_URL;
 
-function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
+function BusTimeConductor({ busID, busRegNo, routeNo, direction }) {
   const [schedules, setSchedules] = useState([]);
   const [fromSchedule, setFromSchedule] = useState(null);
   const [toSchedule, setToSchedule] = useState(null);
@@ -26,59 +27,69 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [updateLocationInterval, setUpdateLocationInterval] = useState(null);
+  const [retrieveLocationInterval, setRetrieveLocationInterval] = useState(
+    null
+  );
 
   const [journeyStarted, setJourneyStarted] = useState(false);
   const [allStops, setAllStops] = useState([]);
   const [requiredStopLocations, setRequiredStopLocations] = useState([]);
-
+  const [token, setToken] = useState("");
   const [delay, setDelay] = useState();
   const delayRef = useRef(null);
   const nextStopRef = useRef(null);
-  const [lastLeftStop, setLastLeftStop] = useState('');
-  const [nextLocation, setNextLocation] = useState('');
-
-  const token = localStorage.getItem('token');
+  const [lastLeftStop, setLastLeftStop] = useState("");
+  const [nextLocation, setNextLocation] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
-    function success(position) {
-      setLatitude(position.coords.latitude);
-      setLongitude(position.coords.longitude);
-    }
+    const getStoredDetails = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("token");
 
-    function failure(position) {
-      console.log('failed to get location');
-    }
+        setToken(storedToken);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+      }
+    };
 
-    navigator.geolocation.getCurrentPosition(success, failure);
+    getStoredDetails();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLatitude(location.coords.latitude);
+      setLongitude(location.coords.longitude);
+    })();
   }, []);
 
   //SEND LOCATION
   const updateLocation = async () => {
-    async function success(position) {
-      const response = await axios.put(
-        `http://localhost:8080/busLocation/${busID}`,
-        {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
-      );
+    let location = await Location.getCurrentPositionAsync({});
+    const response = await axios.put(
+      `${apiUrl}/busLocation/${busID}`,
+      {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-      console.log(
-        'location updated to',
-        position.coords.latitude,
-        position.coords.longitude,
-      );
-    }
-
-    function failure(position) {
-      console.log('failed to get location');
-    }
-
-    navigator.geolocation.getCurrentPosition(success, failure);
+    console.log(
+      "location updated to",
+      location.coords.latitude,
+      location.coords.longitude
+    );
   };
 
   const onJourneyStart = () => {
@@ -98,29 +109,26 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
     const fetchSchedules = async () => {
       console.log(1111111111);
       try {
-        const response = await axios.get(
-          `http://localhost:8080/bus/${busID}/stops`,
-          {
-            headers: {Authorization: `Bearer ${token}`},
-          },
-        ); //Schedules of the current bus
+        const response = await axios.get(`${apiUrl}/bus/${busID}/stops`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }); //Schedules of the current bus
         //console.log("fetched scheduled for the selected bus ", response.data);
         //console.log("stop:", stops);
-        let stops = response.data.map(stop => {
+        let stops = response.data.map((stop) => {
           return {
-            stop: stop['busStop']['name'],
-            arraivalTime: stop['arrivalTime'],
-            departureTime: stop['departureTime'],
+            stop: stop["busStop"]["name"],
+            arraivalTime: stop["arrivalTime"],
+            departureTime: stop["departureTime"],
           };
         });
-        console.log('all stops', stops);
-        console.log('response data', response.data);
+        console.log("all stops", stops);
+        console.log("response data", response.data);
         setAllStops(stops);
         setSchedules(response.data);
-        console.log('schedulessssssss', response.data);
+        console.log("schedulessssssss", response.data);
       } catch (error) {
-        setError('Error fetching bus schedules.');
-        console.error('Error fetching bus schedules:', error.message);
+        setError("Error fetching bus schedules.");
+        console.error("Error fetching bus schedules:", error.message);
       } finally {
         setLoading(false);
       }
@@ -130,7 +138,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
   }, [busID]);
 
   useEffect(() => {
-    console.log('requiredStopLocations state updated:', requiredStopLocations);
+    console.log("requiredStopLocations state updated:", requiredStopLocations);
   }, [requiredStopLocations]);
 
   useEffect(() => {
@@ -138,32 +146,29 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
       try {
         if (allStops.length) {
           console.log(allStops);
-          const response = await axios.get(
-            `http://localhost:8080/busstoplocations`,
-            {
-              headers: {Authorization: `Bearer ${token}`},
-            },
-          ); //Schedules of the current bus
+          const response = await axios.get(`${apiUrl}/busstoplocations`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }); //Schedules of the current bus
           //console.log("fetched scheduled for the selected bus ", response.data);
-          console.log('all stops in fetchStopLocations', allStops);
-          let requiredStopLocationsArr = response.data.filter(location => {
+          console.log("all stops in fetchStopLocations", allStops);
+          let requiredStopLocationsArr = response.data.filter((location) => {
             for (let i = 0; i < allStops.length; i++) {
               if (allStops[i].stop === location.location) {
                 return location.location;
               }
             }
           });
-          if (direction === 'down') {
+          if (direction === "down") {
             requiredStopLocationsArr.reverse();
           }
-          console.log('required StopLocations', requiredStopLocationsArr);
+          console.log("required StopLocations", requiredStopLocationsArr);
           setRequiredStopLocations(requiredStopLocationsArr);
           console.log(requiredStopLocations);
-          console.log('yessssss');
+          console.log("yessssss");
         }
       } catch (error) {
-        setError('Error fetching bus schedules.');
-        console.error('Error fetching bus schedules:', error.message);
+        setError("Error fetching bus schedules.");
+        console.error("Error fetching bus schedules:", error.message);
       } finally {
         setLoading(false);
       }
@@ -176,7 +181,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
 
   //function for getting distance between two locations
   function haversineDistance(lat1, lon1, lat2, lon2) {
-    const toRadians = degree => degree * (Math.PI / 180);
+    const toRadians = (degree) => degree * (Math.PI / 180);
 
     const R = 6371e3; // Earth radius in meters
     const φ1 = toRadians(lat1);
@@ -203,7 +208,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
     const now = new Date();
 
     const [targetHour, targetMinute, targetSecond] = targetTime
-      .split(':')
+      .split(":")
       .map(Number);
     const targetDate = new Date(
       now.getFullYear(),
@@ -211,7 +216,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
       now.getDate(),
       targetHour,
       targetMinute,
-      targetSecond,
+      targetSecond
     );
 
     const differenceInMilliseconds = targetDate - now;
@@ -232,26 +237,26 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
   }
 
   const retrieveLocation = async () => {
-    const response = await axios.get(`http://localhost:8080/bus/${busID}`, {
-      headers: {Authorization: `Bearer ${token}`},
+    const response = await axios.get(`${apiUrl}/bus/${busID}`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     console.log(
-      'current loaction of the bus is ',
+      "current loaction of the bus is ",
       response.data.latitude,
-      response.data.longitude,
+      response.data.longitude
     );
 
     let curRetrievedLatitude = response.data.latitude;
     let curRetrievedLongitude = response.data.longitude;
 
     console.log(
-      'curRetrieved Latitude Longtitude ',
+      "curRetrieved Latitude Longtitude ",
       curRetrievedLatitude,
-      curRetrievedLongitude,
+      curRetrievedLongitude
     );
-    console.log('requiredStopLocations before for loop', requiredStopLocations);
-    console.log('Schedules', schedules);
+    console.log("requiredStopLocations before for loop", requiredStopLocations);
+    console.log("Schedules", schedules);
 
     if (
       requiredStopLocations.length &&
@@ -263,7 +268,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
           requiredStopLocation.latitude,
           requiredStopLocation.longitude,
           7.291006007978523,
-          80.63436016153199,
+          80.63436016153199
           // ,curRetrievedLatitude,
           // curRetrievedLongitude
         );
@@ -272,57 +277,59 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
           console.log(
             `Location ${
               requiredStopLocation.location
-            } is within ${500} meters of Your current location `,
+            } is within ${500} meters of Your current location `
           );
 
           let delayTimeInMilliSecondsObj = filteredSchedules
-            .filter(stop => stop.busStop.name === requiredStopLocation.location)
-            .map(stop => {
+            .filter(
+              (stop) => stop.busStop.name === requiredStopLocation.location
+            )
+            .map((stop) => {
               let arrivalOrDepartureTime =
                 stop.arrivalTime || stop.departureTime;
               return getAbsoluteDifferenceInMilliseconds(
-                arrivalOrDepartureTime,
+                arrivalOrDepartureTime
               );
             })
             .sort((a, b) => a.absoluteDifference - b.absoluteDifference)[0];
-          console.log('hi');
+          console.log("hi");
           if (delayTimeInMilliSecondsObj.difference < 0) {
             let delayTimeInMinutes = convertMillisecondsToMinutesSeconds(
-              delayTimeInMilliSecondsObj.absoluteDifference,
+              delayTimeInMilliSecondsObj.absoluteDifference
             );
 
-            console.log('delay is ', delayTimeInMinutes);
+            console.log("delay is ", delayTimeInMinutes);
             delayRef.current = delayTimeInMinutes;
             setDelay(delayTimeInMinutes);
           } else {
-            console.log('No delay');
-            setDelay('0');
-            delayRef.current = '0';
+            console.log("No delay");
+            setDelay("0");
+            delayRef.current = "0";
           }
 
           setLastLeftStop(requiredStopLocation.location);
 
-          console.log('index ', index);
+          console.log("index ", index);
           console.log(
-            'requiredStopLocation.length - 1 ',
-            requiredStopLocations.length - 1,
+            "requiredStopLocation.length - 1 ",
+            requiredStopLocations.length - 1
           );
-          console.log('if condition', index < requiredStopLocations.length - 1);
+          console.log("if condition", index < requiredStopLocations.length - 1);
 
           if (index < requiredStopLocations.length - 1) {
             nextStopRef.current = requiredStopLocations[index + 1].location;
             setNextLocation(requiredStopLocations[index + 1].location);
           } else {
-            console.log('elseee next location ', nextLocation);
-            nextStopRef.current = 'End of the Stop';
-            setNextLocation('End of the Stop');
+            console.log("elseee next location ", nextLocation);
+            nextStopRef.current = "End of the Stop";
+            setNextLocation("End of the Stop");
           }
 
           try {
-            console.log('delay inside ', delayRef.current);
+            console.log("delay inside ", delayRef.current);
 
             const postResponse = await axios.post(
-              `http://localhost:8080/bus`,
+              `${apiUrl}/bus`,
               {
                 id: busID,
                 delay: delayRef.current,
@@ -330,21 +337,21 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
                 nextLocation: nextStopRef.current,
               },
               {
-                headers: {Authorization: `Bearer ${token}`},
-              },
+                headers: { Authorization: `Bearer ${token}` },
+              }
             );
             console.log(
-              'Updated bus management successfully.',
-              postResponse.data,
+              "Updated bus management successfully.",
+              postResponse.data
             );
           } catch (postError) {
-            console.error('Error updating bus management:', postError.message);
+            console.error("Error updating bus management:", postError.message);
           }
         } else {
           console.log(
             `Location ${
               requiredStopLocation.location
-            } is not within ${500} meters of Your current location`,
+            } is not within ${500} meters of Your current location`
           );
         }
       });
@@ -354,12 +361,12 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
   function scheduleTasks(startEndTimes, startTaskFunction, endTaskFunction) {
     const now = new Date();
     console.log(startEndTimes);
-    const {startTime, endTime} = startEndTimes;
+    const { startTime, endTime } = startEndTimes;
 
-    const [startHour, startMinute, startSecond] = '11:12:13' //startTime
-      .split(':')
+    const [startHour, startMinute, startSecond] = "11:12:13" //startTime
+      .split(":")
       .map(Number);
-    const [endHour, endMinute, endSecond] = '18:12:13'.split(':').map(Number); //endTime.split(":").map(Number);
+    const [endHour, endMinute, endSecond] = "18:12:13".split(":").map(Number); //endTime.split(":").map(Number);
 
     let startDateTime = new Date(
       now.getFullYear(),
@@ -368,7 +375,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
       startHour,
       startMinute,
       startSecond,
-      0,
+      0
     );
     let endDateTime = new Date(
       now.getFullYear(),
@@ -377,7 +384,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
       endHour,
       endMinute,
       endSecond,
-      0,
+      0
     );
 
     // If the end time is in the past today, schedule for tomorrow
@@ -389,10 +396,10 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
     const endDelay = endDateTime - now;
 
     console.log(
-      `Start task scheduled to start at ${startDateTime} which is after ${startDelay} milliseconds`,
+      `Start task scheduled to start at ${startDateTime} which is after ${startDelay} milliseconds`
     );
     console.log(
-      `End task scheduled to end at ${endDateTime} which is after ${endDelay} milliseconds`,
+      `End task scheduled to end at ${endDateTime} which is after ${endDelay} milliseconds`
     );
 
     setTimeout(() => {
@@ -403,29 +410,29 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
 
   // // Example task functions
   function startTask() {
-    console.log('Start task executed at', new Date());
+    console.log("Start task executed at", new Date());
     const curRetrieveLocationInterval = setInterval(retrieveLocation, 15000);
     setRetrieveLocationInterval(curRetrieveLocationInterval);
   }
 
   function endTask() {
-    console.log('Start task ended at', new Date());
+    console.log("Start task ended at", new Date());
     clearInterval(retrieveLocationInterval);
   }
 
   // // Example start and end times array (24-hour format with seconds)
-  const startEndTimes = {startTime: undefined, endTime: undefined};
+  const startEndTimes = { startTime: undefined, endTime: undefined };
 
   // Schedule the tasks to start and end at each specified time
 
   useEffect(() => {
-    console.log('Schedules', schedules);
+    console.log("Schedules", schedules);
     if (schedules.length > 0) {
       const filteredSchedules = schedules.filter(
-        schedule => schedule.direction === direction,
+        (schedule) => schedule.direction === direction
       );
-      console.log('filtered schedule', filteredSchedules);
-      const filteredStopTimes = filteredSchedules.map(schedule => {
+      console.log("filtered schedule", filteredSchedules);
+      const filteredStopTimes = filteredSchedules.map((schedule) => {
         return {
           arrivalTime: schedule.arrivalTime,
           departureTime: schedule.departureTime,
@@ -433,7 +440,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
         };
       });
 
-      console.log('filteredStopTimes:', filteredStopTimes);
+      console.log("filteredStopTimes:", filteredStopTimes);
 
       const startEndTimes = {
         startTime: filteredStopTimes[0].departureTime,
@@ -443,7 +450,7 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
         scheduleTasks(startEndTimes, startTask, endTask);
       setFromSchedule(filteredStopTimes[0].busStop.name);
       setToSchedule(
-        filteredStopTimes[filteredStopTimes.length - 1].busStop.name,
+        filteredStopTimes[filteredStopTimes.length - 1].busStop.name
       );
     }
   }, [schedules, requiredStopLocations]);
@@ -452,159 +459,236 @@ function BusTimeConductor({busID, busRegNo, routeNo, direction}) {
   if (error) return <Text>{error}</Text>;
 
   const filteredSchedules = schedules.filter(
-    schedule => schedule.direction === direction,
+    (schedule) => schedule.direction === direction
   );
 
   if (!fromSchedule || !toSchedule) {
     return <Text>No schedule available for the selected route.</Text>;
   }
 
-  const windowHeight = Dimensions.get('window').height;
-
+  const windowHeight = Dimensions.get("window").height;
   return (
-    <View style={styles.card}>
-      <View style={styles.headerBar}>
-        <Text style={styles.headerText}>Bus: {busRegNo}</Text>
-        <Text style={styles.headerText}>Route No: {routeNo}</Text>
-      </View>
-      <View style={styles.middleBar}>
-        <View>
-          <Text style={styles.labelText}>From:</Text>
-          <Text style={styles.infoText}>{fromSchedule}</Text>
+    <View style={styles.container}>
+      {/* <Image
+        source={require("../../../assets/images/POWERED.gif")}
+        style={styles.logo}
+      /> */}
+      <View style={styles.card}>
+        <View style={styles.headerBar}>
+          <Text style={styles.headerText}>Bus: {busRegNo}</Text>
+          <Text style={styles.headerText}>Route No: {routeNo}</Text>
         </View>
-        <View>
-          <Text style={styles.labelText}>To:</Text>
-          <Text style={styles.infoText}>{toSchedule}</Text>
+        <View style={styles.middleBar}>
+          <View>
+            <Text style={styles.labelText}>From:</Text>
+            <Text style={styles.infoText}>{fromSchedule}</Text>
+          </View>
+          <View>
+            <Text style={styles.labelText}>To:</Text>
+            <Text style={styles.infoText}>{toSchedule}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.footerBar}>
-        <View style={styles.footerItem2}>
-          <Text style={styles.footerText}>Get off from {lastLeftStop}</Text>
+        <View style={styles.blueDown}>
+          <View>
+            <CustomButton
+              type="white"
+              text="Dropping Points"
+              onPress={() => setModalVisible(true)}
+            />
+          </View>
         </View>
-        <View>
-          <Picker
-            style={styles.picker}
-            selectedValue={filteredSchedules[0]?.busStop.name}>
-            {filteredSchedules.map((schedule, index) => (
-              <Picker.Item
-                key={index}
-                label={
-                  index === 0
-                    ? `${schedule.busStop.name} - Departure: ${schedule.departureTime}`
-                    : `${schedule.busStop.name} - Arrival: ${schedule.arrivalTime}`
-                }
-                value={schedule.busStop.name}
-              />
-            ))}
-          </Picker>
+        <View style={styles.footerBar}>
+          <View style={styles.footerItem2}>
+            <Text style={styles.footerText}>Get off from {lastLeftStop}</Text>
+          </View>
+          <View style={styles.footerItem}>
+            <Text style={styles.delayText}>Delay: {delay}min</Text>
+          </View>
         </View>
-        <View style={styles.footerItem}>
-          <Text style={styles.delayText}>Delay: {delay}min</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, { opacity: journeyStarted ? 0.5 : 1 }]}
+            onPress={onJourneyStart}
+            disabled={journeyStarted}
+          >
+            <Text style={styles.buttonText}>Start Journey</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, { opacity: journeyStarted ? 1 : 0.5 }]}
+            onPress={onJourneyEnd}
+            disabled={!journeyStarted}
+          >
+            <Text style={styles.buttonText}>End Journey</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, {opacity: journeyStarted ? 0.5 : 1}]}
-          onPress={onJourneyStart}
-          disabled={journeyStarted}>
-          <Text style={styles.buttonText}>Start Journey</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, {opacity: journeyStarted ? 1 : 0.5}]}
-          onPress={onJourneyEnd}
-          disabled={!journeyStarted}>
-          <Text style={styles.buttonText}>End Journey</Text>
-        </TouchableOpacity>
+
+        <Modal visible={modalVisible} animationType="slide" transparent={true}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Dropping Points</Text>
+              <ScrollView>
+                {filteredSchedules.map((schedule, index) => (
+                  <View key={index} style={styles.scheduleItem}>
+                    <Text style={styles.scheduleText}>
+                      {index === 0
+                        ? `${schedule.busStop.name} - Departure: ${schedule.departureTime}`
+                        : `${schedule.busStop.name} - Arrival: ${schedule.arrivalTime}`}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    margin: 20,
+  container: {
+    flex: 1,
+    backgroundColor: "#f2f2f2",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#bbdfea',
-    shadowColor: '#abb6ba',
-    borderRadius: 5,
-    elevation: 3,
-    shadowOpacity: 1,
+  },
+  card: {
+    width: "100%",
+    padding: 20,
+    backgroundColor: "#ffffff",
+    shadowColor: "#000000",
+    borderRadius: 10,
+    elevation: 5,
+    shadowOpacity: 0.3,
     shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
   },
   headerBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#1E2772',
-    borderTopRightRadius: 5,
-    borderTopLeftRadius: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#004ba0",
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
     padding: 10,
-    color: 'white',
+    color: "white",
   },
   headerText: {
-    color: 'white',
-    fontSize: 15,
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   middleBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
     padding: 10,
   },
-
   labelText: {
-    fontSize: 15,
+    fontSize: 16,
     marginBottom: 5,
+    fontWeight: "bold",
+    color: "#333333",
   },
   infoText: {
     fontSize: 18,
+    color: "#666666",
+  },
+  blueDown: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#004ba0",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    color: "white",
   },
   footerBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#1E2772',
-    borderBottomRightRadius: 5,
-    borderBottomLeftRadius: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#004ba0",
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
     padding: 10,
-    color: 'white',
+    color: "white",
   },
   footerItem: {
     padding: 5,
-    fontWeight: 'bold',
-    backgroundColor: '#ff0000',
+    fontWeight: "bold",
+    backgroundColor: "#ff0000",
     borderRadius: 3,
   },
   footerItem2: {
     padding: 5,
-    fontWeight: 'bold',
-    backgroundColor: '#90EE90',
+    fontWeight: "bold",
+    backgroundColor: "#90EE90",
     borderRadius: 3,
   },
   footerText: {
     padding: 2,
-    color: 'black',
-  },
-  picker: {
-    width: 250,
-    height: 40,
-    backgroundColor: 'white',
+    color: "black",
   },
   delayText: {
     padding: 6,
-    color: 'white',
+    color: "white",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   button: {
-    backgroundColor: 'hsl(0, 93%, 70%)',
+    backgroundColor: "hsl(0, 93%, 70%)",
     borderRadius: 5,
     padding: 10,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  scheduleItem: {
+    padding: 10,
+    borderBottomColor: "#ddd",
+    borderBottomWidth: 1,
+  },
+  scheduleText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#004ba0",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

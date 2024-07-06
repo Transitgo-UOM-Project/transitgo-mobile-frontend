@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,84 +8,83 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
-} from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Picker} from '@react-native-picker/picker';
+} from "react-native";
+import axios from "axios";
+import Config from "../../../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 
+const apiUrl = Config.API_BASE_URL;
 function FormConductor() {
   const [pack, setPack] = useState({
-    packageID: '',
-    status: '',
+    packageID: "",
+    status: "",
   });
 
   const [pacDet, setPacDet] = useState([]);
-  const token = AsyncStorage.getItem('token');
-  const id = AsyncStorage.getItem('id');
+  const token = AsyncStorage.getItem("token");
+  const id = AsyncStorage.getItem("id");
   const Authorization = {
-    headers: {Authorization: `Bearer ${token}`},
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   useEffect(() => {
     loadPackageDetails();
   }, []);
 
-  const {packageID, status} = pack;
+  const { packageID, status } = pack;
 
   const onInputChange = (key, value) => {
-    setPack({...pack, [key]: value});
+    setPack({ ...pack, [key]: value });
   };
 
   const loadPackageDetails = async () => {
     try {
-      const packages = await axios.get(
-        'http://localhost:8080/packages',
-        Authorization,
-      );
+      const packages = await axios.get(`${apiUrl}/packages`, Authorization);
       const packageArray = packages.data || [];
       const filteredPackages = packageArray.filter(
-        pac => String(pac.employeeId) === String(id),
+        (pac) => String(pac.employeeId) === String(id)
       );
       setPacDet(filteredPackages);
     } catch (error) {
-      console.log('Error loading packages', error);
+      console.log("Error loading packages", error);
     }
   };
 
   const onSubmitPack = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/package/${packageID}`,
+        `/package/${packageID}`,
         pack,
-        Authorization,
+        Authorization
       );
       setPack({
-        packageID: '',
-        status: '',
+        packageID: "",
+        status: "",
       });
       loadPackageDetails();
     } catch (error) {
-      Alert.alert('Package is not available');
+      Alert.alert("Package is not available");
     }
   };
 
   const clearForm = () => {
     setPack({
-      packageID: '',
-      status: '',
+      packageID: "",
+      status: "",
     });
   };
 
-  const getStatusColor = status => {
+  const getStatusColor = (status) => {
     switch (status) {
-      case 'Booked':
-        return 'red';
-      case 'Received':
-        return 'blue';
-      case 'Completed':
-        return 'green';
+      case "Booked":
+        return "red";
+      case "Received":
+        return "blue";
+      case "Completed":
+        return "green";
       default:
-        return '#000';
+        return "#000";
     }
   };
 
@@ -101,7 +100,8 @@ function FormConductor() {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={pack.status}
-          onValueChange={itemValue => onInputChange('status', itemValue)}>
+          onValueChange={(itemValue) => onInputChange("status", itemValue)}
+        >
           <Picker.Item label="Received" value="Received" />
           <Picker.Item label="Completed" value="Completed" />
         </Picker>
@@ -112,7 +112,7 @@ function FormConductor() {
       </View>
       <View style={styles.packageList}>
         {pacDet.length > 0 ? (
-          pacDet.map(pac => (
+          pacDet.map((pac) => (
             <TouchableOpacity
               key={pac.packageID}
               style={styles.packageItem}
@@ -121,7 +121,8 @@ function FormConductor() {
                   packageID: pac.packageID,
                   status: pac.status,
                 })
-              }>
+              }
+            >
               <Text style={styles.packageText}>
                 Package ID: {pac.packageID}
               </Text>
@@ -129,14 +130,18 @@ function FormConductor() {
                 {pac.start} - {pac.destination}
               </Text>
               <Text style={styles.packageText}>{pac.receiverName}</Text>
-              <Text style={[styles.packageText, {color: '#FA6B6B'}]}>
+              <Text style={[styles.packageText, { color: "#FA6B6B" }]}>
                 {pac.receiverContact}
               </Text>
               <Text
                 style={[
                   styles.packageText,
-                  {backgroundColor: getStatusColor(pac.status), color: 'white'},
-                ]}>
+                  {
+                    backgroundColor: getStatusColor(pac.status),
+                    color: "white",
+                  },
+                ]}
+              >
                 {pac.status}
               </Text>
             </TouchableOpacity>
@@ -156,25 +161,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginBottom: 20,
     borderRadius: 5,
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 20,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   packageList: {
@@ -183,11 +188,11 @@ const styles = StyleSheet.create({
   packageItem: {
     padding: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
-    alignItems: 'center',
+    backgroundColor: "#f9f9f9",
+    alignItems: "center",
   },
   packageText: {
     fontSize: 16,
@@ -195,7 +200,7 @@ const styles = StyleSheet.create({
   },
   noPackageText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.5,
   },
 });
