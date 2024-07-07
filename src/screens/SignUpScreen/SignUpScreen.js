@@ -3,25 +3,15 @@ import {
   Text,
   Alert,
   StyleSheet,
-  useWindowDimensions,
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import {
-  validateFname,
-  validateLname,
-  validateUsername,
-  validateEmail,
-  validatePassword,
-  validateConfirmpassword,
-} from "../../components/Validations";
 import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Config from "@/config";
-
 
 const apiURL = Config.API_BASE_URL;
 
@@ -33,8 +23,6 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
   const [userType, setUserType] = useState("passenger");
-
-  //const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
   const [formErrors, setFormErrors] = useState({
@@ -91,10 +79,10 @@ const SignUpScreen = () => {
       Alert.alert("Registration Successful");
       navigation.navigate("EmailVerification");
     } catch (error) {
-      if(error.response && error.response.data){
+      if (error.response && error.response.data) {
         setFormErrors({
           ...formErrors,
-          email: error.response.data
+          email: error.response.data,
         });
       }
       Alert.alert("Something went wrong, please try again later.");
@@ -117,8 +105,8 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView>
-      <SafeAreaView>
+    <SafeAreaView>
+      <ScrollView>
         <View style={styles.root}>
           <Text style={styles.title}>Create New Account</Text>
           <CustomInput
@@ -167,7 +155,7 @@ const SignUpScreen = () => {
           {formErrors.confirmpassword ? (
             <Text style={styles.error}>{formErrors.confirmpassword}</Text>
           ) : null}
-          <CustomInput value={userType}  editable={false}/>
+          <CustomInput value={userType} editable={false} />
 
           <CustomButton text="Sign Up" onPress={onSignUpPressed} />
           <Text style={styles.text}>
@@ -192,8 +180,8 @@ const SignUpScreen = () => {
             type="tertiary1"
           />
         </View>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -201,11 +189,6 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     padding: 20,
-  },
-  logo: {
-    width: "70%",
-    maxWidth: 500,
-    maxHeight: 300,
   },
   title: {
     fontSize: 25,
@@ -219,9 +202,8 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
-    fontSize: "10px"
-  }
-})
-;
+    fontSize: 10,
+  },
+});
 
 export default SignUpScreen;

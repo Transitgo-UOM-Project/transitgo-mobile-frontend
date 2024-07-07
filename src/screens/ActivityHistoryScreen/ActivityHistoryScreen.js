@@ -172,83 +172,85 @@ const ActivityHistoryScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <SafeAreaView>
-        <View style={styles.pad}>
-          {activityLog.length > 0 ? (
-            activityLog.map((activity) => (
-              <View key={activity.activityId} style={styles.itemContainer}>
-                <Text style={styles.label}>
-                  {activity.activityType}
-                  {activity.activityType === "Package" && (
-                    <Text style={styles.label}>- {activity.activityId}</Text>
-                  )}
-                </Text>
-                {isEditing === activity.activityId ? (
-                  <CustomInputProfile
-                    value={editDescription}
-                    onChangeText={(text) => setEditDescription(text)}
-                  />
-                ) : (
-                  <Text style={styles.value}>
-                    {activity.description} {activity.info}
+    <SafeAreaView>
+      <ScrollView>
+        <ScrollView style={styles.container}>
+          <View style={styles.pad}>
+            {activityLog.length > 0 ? (
+              activityLog.map((activity) => (
+                <View key={activity.activityId} style={styles.itemContainer}>
+                  <Text style={styles.label}>
+                    {activity.activityType}
+                    {activity.activityType === "Package" && (
+                      <Text style={styles.label}>- {activity.activityId}</Text>
+                    )}
                   </Text>
-                )}
-                <Text style={styles.labelred}>
-                  Posted On:{" "}
-                  <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
-                </Text>
-                <View style={styles.card}>
-                  {activity.activityType !== "Package" ? (
-                    <>
-                      <TouchableOpacity
-                        onPress={() =>
-                          handleDelete(
-                            activity.activityType,
-                            activity.activityId
-                          )
-                        }
-                      >
-                        <View style={styles.icon}>
-                          <Icon name="trash" size={15} color="#132968" />
-                        </View>
-                      </TouchableOpacity>
-                      {isEditing === activity.activityId ? (
-                        <TouchableOpacity
-                          onPress={() => handleSaveEdit(activity)}
-                        >
-                          <View style={styles.icon}>
-                            <Text>Save</Text>
-                          </View>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={() => handleEditClick(activity)}
-                        >
-                          <View style={styles.icon}>
-                            <Icon name="pencil" size={15} color="#132968" />
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                    </>
-                  ) : (
-                    <CustomButton
-                      style={{
-                        ...styles.btn,
-                        backgroundColor: getStatusColor(activity.pacStatus),
-                      }}
-                      text={activity.pacStatus}
+                  {isEditing === activity.activityId ? (
+                    <CustomInputProfile
+                      value={editDescription}
+                      onChangeText={(text) => setEditDescription(text)}
                     />
+                  ) : (
+                    <Text style={styles.value}>
+                      {activity.description} {activity.info}
+                    </Text>
                   )}
+                  <Text style={styles.labelred}>
+                    Posted On:{" "}
+                    <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
+                  </Text>
+                  <View style={styles.card}>
+                    {activity.activityType !== "Package" ? (
+                      <>
+                        <TouchableOpacity
+                          onPress={() =>
+                            handleDelete(
+                              activity.activityType,
+                              activity.activityId
+                            )
+                          }
+                        >
+                          <View style={styles.icon}>
+                            <Icon name="trash" size={15} color="#132968" />
+                          </View>
+                        </TouchableOpacity>
+                        {isEditing === activity.activityId ? (
+                          <TouchableOpacity
+                            onPress={() => handleSaveEdit(activity)}
+                          >
+                            <View style={styles.icon}>
+                              <Text>Save</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => handleEditClick(activity)}
+                          >
+                            <View style={styles.icon}>
+                              <Icon name="pencil" size={15} color="#132968" />
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                      </>
+                    ) : (
+                      <CustomButton
+                        style={{
+                          ...styles.btn,
+                          backgroundColor: getStatusColor(activity.pacStatus),
+                        }}
+                        text={activity.pacStatus}
+                      />
+                    )}
+                  </View>
                 </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.no}>No Activity Found</Text>
-          )}
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+              ))
+            ) : (
+              <Text style={styles.no}>No Activity Found</Text>
+            )}
+          </View>
+        </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
