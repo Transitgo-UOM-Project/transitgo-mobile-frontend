@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from "react";
+
 import {
   View,
   Text,
@@ -7,12 +9,14 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
 import Config from "../../../config";
 const apiUrl = Config.API_BASE_URL;
+
 
 function FormConductor() {
   const [pack, setPack] = useState({
@@ -21,6 +25,7 @@ function FormConductor() {
   });
 
   const [pacDet, setPacDet] = useState([]);
+
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
 
@@ -45,11 +50,14 @@ function FormConductor() {
 
   const onInputChange = (key, value) => {
     setPack((prevPack) => ({ ...prevPack, [key]: value }));
+
   };
 
   const loadPackageDetails = async () => {
     try {
+
       const packages = await axios.get(`${apiUrl}/packages`, {
+
         headers: { Authorization: `Bearer ${token}` },
       });
       const packageArray = packages.data || [];
@@ -64,7 +72,9 @@ function FormConductor() {
 
   const onSubmitPack = async () => {
     try {
+
       const response = await axios.put(`${apiUrl}/package/${packageID}`, pack, {
+
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response);
@@ -74,7 +84,9 @@ function FormConductor() {
       });
       loadPackageDetails();
     } catch (error) {
+
       Alert.alert("Package is not available", error.message);
+
     }
   };
 
@@ -109,11 +121,13 @@ function FormConductor() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Receive / Transfer Package</Text>
+
       <Text style={styles.packageIdText}>Package ID: {packageID}</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={status}
           onValueChange={(itemValue) => onInputChange("status", itemValue)}
+
         >
           <Picker.Item label="Received" value="Received" />
           <Picker.Item label="Completed" value="Completed" />
@@ -129,25 +143,31 @@ function FormConductor() {
             <TouchableOpacity
               key={pac.packageID}
               style={styles.packageItem}
+
               onPress={() => onPressPackage(pac)}
             >
               <Text style={styles.packageText}>
                 Package ID: {pac.packageID}
               </Text>
+
               <Text style={styles.packageText}>
                 {pac.start} - {pac.destination}
               </Text>
               <Text style={styles.packageText}>{pac.receiverName}</Text>
+
               <Text style={[styles.packageText, { color: "#FA6B6B" }]}>
+
                 {pac.receiverContact}
               </Text>
               <Text
                 style={[
                   styles.packageText,
+
                   {
                     backgroundColor: getStatusColor(pac.status),
                     color: "white",
                   },
+
                 ]}
               >
                 {pac.status}

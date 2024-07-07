@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -21,29 +22,29 @@ const Announcement = () => {
   const [ann, setAnn] = useState("");
   const [annlist, setAnnlist] = useState([]);
   const [editlist, setEditlist] = useState(null);
-
   const [token, setToken] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
-  const Authorization = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      const email = await AsyncStorage.getItem('email');
-      const role = await AsyncStorage.getItem('role');
-      setToken(token);
-      setEmail(email);
-      setRole(role);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const email = await AsyncStorage.getItem('email');
+        const role = await AsyncStorage.getItem('role');
+        setToken(token);
+        setEmail(email);
+        setRole(role);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
     };
     fetchData();
   }, []);
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  }, [token]);
 
   const fetchAnnouncements = async () => {
     try {
@@ -56,12 +57,15 @@ const Announcement = () => {
 
   const onbutPressed = async () => {
     if (ann === "") {
+      Alert.alert("Announcement cannot be empty.");
       return;
     }
     try {
       const response = await axios.post(`${apiUrl}/announcement`, {
         details: ann,
-      }, Authorization);
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setAnnlist([...annlist, response.data]);
       setAnn("");
     } catch (error) {
@@ -78,7 +82,9 @@ const Announcement = () => {
     try {
       await axios.put(`${apiUrl}/announcement/${editlist.id}`, {
         details: ann,
-      }, Authorization);
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const updatedAnn = annlist.map((item) => {
         if (item.id === editlist.id) {
           return { ...item, details: ann };
@@ -95,7 +101,9 @@ const Announcement = () => {
 
   const onDelete = async (id) => {
     try {
-      await axios.delete(`${apiUrl}/announcement/${id}`,Authorization);
+      await axios.delete(`${apiUrl}/announcement/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const updatedDelete = annlist.filter((ann) => ann.id !== id);
       setAnnlist(updatedDelete);
       Alert.alert("Announcement deleted successfully.");
@@ -135,14 +143,14 @@ const Announcement = () => {
           <CustomInput
             placeholder="Add Announcement"
             value={ann}
-            setValue={(userText) => setAnn(userText)}
+            setValue={setAnn}
           />
           {editlist ? (
             <CustomButton text="Save" onPress={onUpdate} />
           ) : (
             <CustomButton text="Submit Post" onPress={onbutPressed} />
           )}
-          <FlatList data={annlist} renderItem={renderAnn} />
+          <FlatList data={annlist} renderItem={renderAnn} keyExtractor={(item) => item.id.toString()} />
         </View>
       </SafeAreaView>
     </View>
