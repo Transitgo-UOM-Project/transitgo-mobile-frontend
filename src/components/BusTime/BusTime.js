@@ -23,6 +23,8 @@ function BusTime({
   toStop,
   direction,
   date,
+  delay,
+  lastLeftStop,
 }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +80,8 @@ function BusTime({
   const fromTime = fromSchedule.departureTime;
   const toTime = toSchedule.arrivalTime;
 
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <View style={styles.container}>
       <View style={styles.blueUp}>
@@ -120,10 +124,12 @@ function BusTime({
       </View>
       <View>
         <View style={styles.blueDown}>
-          <View style={styles.greendown}>
-            <Text style={styles.smallText}>Got Off at:</Text>
-            <Text style={styles.midText}>08.00</Text>
-          </View>
+          {date === today && lastLeftStop && (
+            <View style={styles.greendown}>
+              <Text style={styles.smallText}>Got Off at:</Text>
+              <Text style={styles.midText}>{lastLeftStop}</Text>
+            </View>
+          )}
           <View>
             <CustomButton
               type="white"
@@ -136,10 +142,12 @@ function BusTime({
               onPress={() => navigation.navigate("ReviewsRatings", { busID })}
             />
           </View>
-          <View style={styles.reddown}>
-            <Text style={styles.smallText}>Delay:</Text>
-            <Text style={styles.midText}>10 min</Text>
-          </View>
+          {date === today && delay && (
+            <View style={styles.reddown}>
+              <Text style={styles.smallText}>Delay:</Text>
+              <Text style={styles.midText}>{delay}</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -190,6 +198,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderTopLeftRadius: 5,
     padding: 10,
+    marginBottom: 10,
     color: "white",
   },
   blueDown: {
@@ -199,6 +208,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 5,
     borderBottomLeftRadius: 5,
     padding: 10,
+    marginBottom: 10,
     color: "white",
   },
   upId: {

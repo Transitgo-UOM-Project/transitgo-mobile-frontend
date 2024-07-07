@@ -9,7 +9,6 @@ const CustomInput = ({
   placeholder,
   secureTextEntry,
   icon,
- 
 }) => {
   return (
     <View style={[styles.container]}>
@@ -21,7 +20,6 @@ const CustomInput = ({
         style={styles.input}
         placeholderTextColor="#999999"
         secureTextEntry={secureTextEntry}
-        
       />
     </View>
   );
