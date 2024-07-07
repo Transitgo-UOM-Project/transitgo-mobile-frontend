@@ -10,13 +10,14 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import CustomInputProfile from "@/src/components/CustomInputProfile/CustomInputProfile";
+
 
 const apiUrl = Config.API_BASE_URL;
 
@@ -26,7 +27,7 @@ const ActivityHistoryScreen = () => {
   const [activityLog, setActivityLog] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
   const [editDescription, setEditDescription] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -172,6 +173,7 @@ const ActivityHistoryScreen = () => {
   };
 
   return (
+
     <SafeAreaView>
       <ScrollView>
         <ScrollView style={styles.container}>
@@ -251,6 +253,7 @@ const ActivityHistoryScreen = () => {
         </ScrollView>
       </ScrollView>
     </SafeAreaView>
+
   );
 };
 
@@ -299,20 +302,15 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
-  btn: {
-    color: "white",
-    padding: "4px",
-    borderRadius: "5px",
-    fontSize: "1rem",
-    display: "inline-flex",
+  statusButton: {
+    padding: 8,
+    borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    cursor: "pointer",
-    margin: "4px",
-    textAlign: "center",
-    minWidth: "50px",
-    height: "30px",
-    lineHeight: "normal",
+  },
+  statusButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   no: {
     textAlign: "center",
