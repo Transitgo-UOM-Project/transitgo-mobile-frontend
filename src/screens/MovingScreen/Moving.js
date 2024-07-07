@@ -116,7 +116,6 @@ const Moving = () => {
       const pack = {
         busID: selectedBus,
         destination: to,
-        payment: "",
         receivedDate: date,
         start: from,
         status: "Booked",
