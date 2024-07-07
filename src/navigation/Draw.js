@@ -8,7 +8,8 @@ import CustomDrawer from "../components/CustomDrawer";
 import BottomTab from "./BottomTab";
 import Tracking from "../screens/TrackingScreen/Tracking";
 import ActivityHistoryScreen from "../screens/ActivityHistoryScreen/ActivityHistoryScreen";
-import FormConductor from "../screens/FormConductor/index";
+import FormConductor from "../screens/FormConductor/FormConductor";
+
 
 const Drawer = createDrawerNavigator();
 
