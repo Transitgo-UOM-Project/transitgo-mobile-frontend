@@ -33,14 +33,14 @@ const Moving = () => {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const navigation = useNavigation();
 
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState("");
   const Authorization = {
     headers: { Authorization: `Bearer ${token}` },
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       setToken(token);
     };
     fetchData();
@@ -102,20 +102,37 @@ const Moving = () => {
       return;
     }
 
-    const pack = {
-      busID: selectedBus,
-      destination: to,
-      payment: "",
-      receivedDate: date,
-      start: from,
-      status: "",
-      receiverName: name,
-      receiverContact: number,
-      receiverNIC: id,
-    };
-
     try {
-      const response = await axios.post(`${apiUrl}/package`, pack, Authorization);
+      // Fetch employee details
+      const empDetail = await axios.get(
+        `${apiUrl}/employee/${selectedBus}`,
+        Authorization
+      );
+      const employeeName =
+        empDetail.data.user.fname + " " + empDetail.data.user.lname;
+      const employeePhone = empDetail.data.user.phone;
+      const employeeId = empDetail.data.user.id;
+
+      const pack = {
+        busID: selectedBus,
+        destination: to,
+        payment: "",
+        receivedDate: date,
+        start: from,
+        status: "Booked",
+        receiverName: name,
+        receiverContact: number,
+        receiverNIC: id,
+        employeeName: employeeName,
+        employeePhone: employeePhone,
+        employeeId: employeeId,
+      };
+
+      const response = await axios.post(
+        `${apiUrl}/package`,
+        pack,
+        Authorization
+      );
       if (response.status === 200) {
         Alert.alert("Success", "Booking confirmed!");
         navigation.navigate("PackageScreen");
