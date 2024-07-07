@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-} from 'react-native';
-import axios from 'axios';
-import CustomButton from '../CustomButton/CustomButton';
-import {useNavigation} from '@react-navigation/native';
-import Config from '../../../config';
+} from "react-native";
+import axios from "axios";
+import CustomButton from "../CustomButton/CustomButton";
+import { useNavigation } from "@react-navigation/native";
+import Config from "../../../config";
 
 const apiUrl = Config.API_BASE_URL;
 
@@ -23,6 +23,8 @@ function BusTime({
   toStop,
   direction,
   date,
+  delay,
+  lastLeftStop,
 }) {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ function BusTime({
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -38,8 +40,8 @@ function BusTime({
         const response = await axios.get(`${apiUrl}/bus/${busID}/stops`);
         setSchedules(response.data);
       } catch (error) {
-        setError('Error fetching bus schedules.');
-        console.error('Error fetching bus schedules:', error.message);
+        setError("Error fetching bus schedules.");
+        console.error("Error fetching bus schedules:", error.message);
       } finally {
         setLoading(false);
       }
@@ -61,14 +63,14 @@ function BusTime({
   if (error) return <Text>{error}</Text>;
 
   const filteredSchedules = schedules.filter(
-    schedule => schedule.direction === direction,
+    (schedule) => schedule.direction === direction
   );
 
   const fromSchedule = filteredSchedules.find(
-    schedule => schedule.busStop.name === fromStop,
+    (schedule) => schedule.busStop.name === fromStop
   );
   const toSchedule = filteredSchedules.find(
-    schedule => schedule.busStop.name === toStop,
+    (schedule) => schedule.busStop.name === toStop
   );
 
   if (!fromSchedule || !toSchedule) {
@@ -77,6 +79,8 @@ function BusTime({
 
   const fromTime = fromSchedule.departureTime;
   const toTime = toSchedule.arrivalTime;
+
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <View style={styles.container}>
@@ -120,10 +124,12 @@ function BusTime({
       </View>
       <View>
         <View style={styles.blueDown}>
-          <View style={styles.greendown}>
-            <Text style={styles.smallText}>Got Off at:</Text>
-            <Text style={styles.midText}>08.00</Text>
-          </View>
+          {date === today && lastLeftStop && (
+            <View style={styles.greendown}>
+              <Text style={styles.smallText}>Got Off at:</Text>
+              <Text style={styles.midText}>{lastLeftStop}</Text>
+            </View>
+          )}
           <View>
             <CustomButton
               type="white"
@@ -133,13 +139,15 @@ function BusTime({
             <CustomButton
               type="white"
               text="Reviews & Ratings"
-              onPress={() => navigation.navigate('ReviewsRatings', {busID})}
+              onPress={() => navigation.navigate("ReviewsRatings", { busID })}
             />
           </View>
-          <View style={styles.reddown}>
-            <Text style={styles.smallText}>Delay:</Text>
-            <Text style={styles.midText}>10 min</Text>
-          </View>
+          {date === today && delay && (
+            <View style={styles.reddown}>
+              <Text style={styles.smallText}>Delay:</Text>
+              <Text style={styles.midText}>{delay}</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -160,7 +168,8 @@ function BusTime({
             </ScrollView>
             <TouchableOpacity
               style={styles.closeButton}
-              onPress={() => setModalVisible(false)}>
+              onPress={() => setModalVisible(false)}
+            >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -175,60 +184,60 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
 
-    flexDirection: 'column',
-    backgroundColor: '#bbdfea',
-    shadowColor: '#abb6ba',
+    flexDirection: "column",
+    backgroundColor: "#bbdfea",
+    shadowColor: "#abb6ba",
     borderRadius: 5,
     elevation: 3,
     shadowOpacity: 1,
   },
   blueUp: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#1E2772',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#1E2772",
     borderTopRightRadius: 5,
     borderTopLeftRadius: 5,
     padding: 10,
     marginBottom: 10,
-    color: 'white',
+    color: "white",
   },
   blueDown: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#1E2772',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#1E2772",
     borderBottomRightRadius: 5,
     borderBottomLeftRadius: 5,
     padding: 10,
     marginBottom: 10,
-    color: 'white',
+    color: "white",
   },
   upId: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   mid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 10,
   },
   midCon: {
     padding: 3,
   },
   midLeft: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   downsub: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     padding: 3,
   },
   greendown: {
-    backgroundColor: '#90ee90',
+    backgroundColor: "#90ee90",
     borderRadius: 3,
     padding: 5,
   },
   reddown: {
-    alignItems: 'flex-end',
-    backgroundColor: '#ff0000',
+    alignItems: "flex-end",
+    backgroundColor: "#ff0000",
     borderRadius: 3,
     padding: 5,
   },
@@ -237,38 +246,38 @@ const styles = StyleSheet.create({
   },
   midText: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   smallTextW: {
     fontSize: 10,
-    color: 'white',
+    color: "white",
   },
   midTextW: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
+    width: "80%",
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   scheduleItem: {
     padding: 10,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
     borderBottomWidth: 1,
   },
   scheduleText: {
@@ -276,14 +285,14 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 20,
-    backgroundColor: '#1E2772',
+    backgroundColor: "#1E2772",
     padding: 10,
     borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

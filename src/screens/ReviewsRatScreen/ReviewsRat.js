@@ -24,14 +24,30 @@ const ReviewsRat = ({ route }) => {
   const [rating, setRating] = useState(3);
   const [reviewList, setReviewList] = useState([]);
   const [editReview, setEditReview] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem("uname");
+        console.log("user name", storedUsername);
+        setUsername(storedUsername);
+      } catch (error) {
+        console.error("Error fetching username: ", error);
+      }
+    };
+
+    fetchUsername();
+  }, []);
 
   useEffect(() => {
     // Fetch existing reviews
     axios
       .get(`${apiUrl}/rates/${busID}`)
       .then((response) => {
-        setReviewList(
-          response.data.map((item) => ({
+        const sortedReviews = response.data
+          .map((item) => ({
             key: item.id.toString(),
             username: item.username,
             review: item.review,
@@ -39,7 +55,8 @@ const ReviewsRat = ({ route }) => {
             date: item.createdAt,
             profileColor: getRandomColor(), // Assign a random color
           }))
-        );
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        setReviewList(sortedReviews);
       })
       .catch((error) => {
         console.error("Error fetching reviews: ", error);
@@ -81,7 +98,7 @@ const ReviewsRat = ({ route }) => {
     const formattedDate = formatDateTime(date);
 
     const newReview = {
-      username: "",
+      username: username,
       profile: null,
       rate: rating,
       review: review,
@@ -94,18 +111,21 @@ const ReviewsRat = ({ route }) => {
     axios
       .post(`${apiUrl}/rate/bus`, newReview)
       .then((response) => {
-        setReviewList([
-          ...reviewList,
+        const updatedReviewList = [
           {
             key: response.data.id.toString(),
+            username,
             review,
             rating,
             date: formattedDate,
             profileColor: getRandomColor(), // Assign a random color
           },
-        ]);
+          ...reviewList,
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+        setReviewList(updatedReviewList);
         setReview("");
         setRating(3);
+        setRefreshing((prev) => !prev);
       })
       .catch((error) => {
         console.error("Error submitting review: ", error);
@@ -124,12 +144,14 @@ const ReviewsRat = ({ route }) => {
   };
 
   const onUpdateReview = () => {
-    const updatedList = reviewList.map((item) => {
-      if (item.key === editReview.key) {
-        return { ...item, review, rating };
-      }
-      return item;
-    });
+    const updatedList = reviewList
+      .map((item) => {
+        if (item.key === editReview.key) {
+          return { ...item, review, rating };
+        }
+        return item;
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     setReviewList(updatedList);
     setEditReview(null);
     setReview("");
@@ -163,22 +185,24 @@ const ReviewsRat = ({ route }) => {
             <Text style={styles.postedbyText}>by : {item.username}</Text>
           </View>
 
-          {/* <View style={styles.pad}>
-            <Icon
-              name="trash"
-              size={15}
-              color="#132968"
-              onPress={() => onDeleteReview(item.key)}
-            />
-            <View style={styles.iconSpacer} />
+          {username === item.username && (
+            <View style={styles.pad}>
+              <Icon
+                name="trash"
+                size={18}
+                color="#132968"
+                onPress={() => onDeleteReview(item.key)}
+              />
+              <View style={styles.iconSpacer} />
 
-            <Icon
-              name="pencil"
-              size={15}
-              color="#132968"
-              onPress={() => onEditReview(item)}
-            />
-          </View> */}
+              <Icon
+                name="pencil"
+                size={18}
+                color="#132968"
+                onPress={() => onEditReview(item)}
+              />
+            </View>
+          )}
         </View>
       </View>
     );
@@ -202,6 +226,7 @@ const ReviewsRat = ({ route }) => {
           placeholder="Enter your comments"
           multiline={true}
           value={review}
+          placeholderTextColor={"#999999"}
           onChangeText={(text) => setReview(text)}
         />
         {editReview ? (
@@ -261,6 +286,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 5,
     justifyContent: "flex-end",
+  },
+  iconSpacer: {
+    marginLeft: 20,
   },
   listText: {
     color: "#132968",
