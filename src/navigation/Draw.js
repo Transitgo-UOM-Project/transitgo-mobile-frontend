@@ -4,12 +4,12 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import ProfileScreen from "../screens/ProfileScreen";
-import MassegesScreen from "../screens/MassegesScreen";
 import CustomDrawer from "../components/CustomDrawer";
 import BottomTab from "./BottomTab";
 import Tracking from "../screens/TrackingScreen/Tracking";
 import ActivityHistoryScreen from "../screens/ActivityHistoryScreen/ActivityHistoryScreen";
 import FormConductor from "../screens/FormConductor/FormConductor";
+
 
 const Drawer = createDrawerNavigator();
 
@@ -19,8 +19,10 @@ const Draw = () => {
   useEffect(() => {
     const getUserRole = async () => {
       try {
-        const role = await AsyncStorage.getItem("userRole");
-        setUserRole(role);
+        const role = await AsyncStorage.getItem("role");
+        if (role) {
+          setUserRole(role);
+        }
       } catch (error) {
         console.error("Failed to fetch user role:", error);
       }
@@ -30,11 +32,7 @@ const Draw = () => {
   }, []);
 
   const getPackageStatusComponent = () => {
-    if (userRole === "employee") {
-      return FormConductor;
-    } else {
-      return Tracking;
-    }
+    return userRole === "employee" ? FormConductor : Tracking;
   };
 
   return (
@@ -70,7 +68,7 @@ const Draw = () => {
         component={getPackageStatusComponent()}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="chatbox-ellipses-outline" size={20} color={color} />
+            <Ionicons name="cube-outline" size={20} color={color} />
           ),
         }}
       />
@@ -79,7 +77,7 @@ const Draw = () => {
         component={ActivityHistoryScreen}
         options={{
           drawerIcon: ({ color }) => (
-            <Ionicons name="chatbox-ellipses-outline" size={20} color={color} />
+            <Ionicons name="time-outline" size={20} color={color} />
           ),
         }}
       />

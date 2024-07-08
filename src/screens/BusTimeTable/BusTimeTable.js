@@ -46,6 +46,8 @@ const BusTimeTable = () => {
                 toStop={to}
                 direction={direction}
                 date={date}
+                delay={bus.delay}
+                lastLeftStop={bus.lastLeftStop}
               />
             ))
           )}

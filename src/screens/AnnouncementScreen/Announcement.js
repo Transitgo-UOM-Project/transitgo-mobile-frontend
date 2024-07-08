@@ -21,7 +21,6 @@ const Announcement = () => {
   const [ann, setAnn] = useState('');
   const [annlist, setAnnlist] = useState([]);
   const [editlist, setEditlist] = useState(null);
-
   const [token, setToken] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
@@ -31,19 +30,23 @@ const Announcement = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      const email = await AsyncStorage.getItem('email');
-      const role = await AsyncStorage.getItem('role');
-      setToken(token);
-      setEmail(email);
-      setRole(role);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const email = await AsyncStorage.getItem('email');
+        const role = await AsyncStorage.getItem('role');
+        setToken(token);
+        setEmail(email);
+        setRole(role);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
     };
     fetchData();
   }, []);
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  }, [token]);
 
   const fetchAnnouncements = async () => {
     try {
@@ -184,7 +187,11 @@ const Announcement = () => {
           ) : (
             <CustomButton text="Submit Post" onPress={onbutPressed} />
           )}
-          <FlatList data={annlist} renderItem={renderAnn} />
+          <FlatList
+            data={annlist}
+            renderItem={renderAnn}
+            keyExtractor={item => item.id.toString()}
+          />
         </View>
       </SafeAreaView>
     </View>

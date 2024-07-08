@@ -10,13 +10,14 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CustomBlue from "../../components/CustomBlue/Index";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import CustomInputProfile from "@/src/components/CustomInputProfile/CustomInputProfile";
+
 
 const apiUrl = Config.API_BASE_URL;
 
@@ -26,7 +27,7 @@ const ActivityHistoryScreen = () => {
   const [activityLog, setActivityLog] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
   const [editDescription, setEditDescription] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -172,83 +173,87 @@ const ActivityHistoryScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <SafeAreaView>
-        <View style={styles.pad}>
-          {activityLog.length > 0 ? (
-            activityLog.map((activity) => (
-              <View key={activity.activityId} style={styles.itemContainer}>
-                <Text style={styles.label}>
-                  {activity.activityType}
-                  {activity.activityType === "Package" && (
-                    <Text style={styles.label}>- {activity.activityId}</Text>
-                  )}
-                </Text>
-                {isEditing === activity.activityId ? (
-                  <CustomInputProfile
-                    value={editDescription}
-                    onChangeText={(text) => setEditDescription(text)}
-                  />
-                ) : (
-                  <Text style={styles.value}>
-                    {activity.description} {activity.info}
+
+    <SafeAreaView>
+      <ScrollView>
+        <ScrollView style={styles.container}>
+          <View style={styles.pad}>
+            {activityLog.length > 0 ? (
+              activityLog.map((activity) => (
+                <View key={activity.activityId} style={styles.itemContainer}>
+                  <Text style={styles.label}>
+                    {activity.activityType}
+                    {activity.activityType === "Package" && (
+                      <Text style={styles.label}>- {activity.activityId}</Text>
+                    )}
                   </Text>
-                )}
-                <Text style={styles.labelred}>
-                  Posted On:{" "}
-                  <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
-                </Text>
-                <View style={styles.card}>
-                  {activity.activityType !== "Package" ? (
-                    <>
-                      <TouchableOpacity
-                        onPress={() =>
-                          handleDelete(
-                            activity.activityType,
-                            activity.activityId
-                          )
-                        }
-                      >
-                        <View style={styles.icon}>
-                          <Icon name="trash" size={15} color="#132968" />
-                        </View>
-                      </TouchableOpacity>
-                      {isEditing === activity.activityId ? (
-                        <TouchableOpacity
-                          onPress={() => handleSaveEdit(activity)}
-                        >
-                          <View style={styles.icon}>
-                            <Text>Save</Text>
-                          </View>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={() => handleEditClick(activity)}
-                        >
-                          <View style={styles.icon}>
-                            <Icon name="pencil" size={15} color="#132968" />
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                    </>
-                  ) : (
-                    <CustomButton
-                      style={{
-                        ...styles.btn,
-                        backgroundColor: getStatusColor(activity.pacStatus),
-                      }}
-                      text={activity.pacStatus}
+                  {isEditing === activity.activityId ? (
+                    <CustomInputProfile
+                      value={editDescription}
+                      onChangeText={(text) => setEditDescription(text)}
                     />
+                  ) : (
+                    <Text style={styles.value}>
+                      {activity.description} {activity.info}
+                    </Text>
                   )}
+                  <Text style={styles.labelred}>
+                    Posted On:{" "}
+                    <Text>{new Date(activity.dateTime).toLocaleString()}</Text>
+                  </Text>
+                  <View style={styles.card}>
+                    {activity.activityType !== "Package" ? (
+                      <>
+                        <TouchableOpacity
+                          onPress={() =>
+                            handleDelete(
+                              activity.activityType,
+                              activity.activityId
+                            )
+                          }
+                        >
+                          <View style={styles.icon}>
+                            <Icon name="trash" size={15} color="#132968" />
+                          </View>
+                        </TouchableOpacity>
+                        {isEditing === activity.activityId ? (
+                          <TouchableOpacity
+                            onPress={() => handleSaveEdit(activity)}
+                          >
+                            <View style={styles.icon}>
+                              <Text>Save</Text>
+                            </View>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => handleEditClick(activity)}
+                          >
+                            <View style={styles.icon}>
+                              <Icon name="pencil" size={15} color="#132968" />
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                      </>
+                    ) : (
+                      <CustomButton
+                        style={{
+                          ...styles.btn,
+                          backgroundColor: getStatusColor(activity.pacStatus),
+                        }}
+                        text={activity.pacStatus}
+                      />
+                    )}
+                  </View>
                 </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.no}>No Activity Found</Text>
-          )}
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+              ))
+            ) : (
+              <Text style={styles.no}>No Activity Found</Text>
+            )}
+          </View>
+        </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
+
   );
 };
 
@@ -297,20 +302,15 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
-  btn: {
-    color: "white",
-    padding: "4px",
-    borderRadius: "5px",
-    fontSize: "1rem",
-    display: "inline-flex",
+  statusButton: {
+    padding: 8,
+    borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    cursor: "pointer",
-    margin: "4px",
-    textAlign: "center",
-    minWidth: "50px",
-    height: "30px",
-    lineHeight: "normal",
+  },
+  statusButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   no: {
     textAlign: "center",

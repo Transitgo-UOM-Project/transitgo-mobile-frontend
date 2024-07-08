@@ -38,10 +38,6 @@ const SigninScreen = () => {
     console.warn('SignUp');
     navigation.navigate('SignUp');
   };
-  const onBusEmployeePressed = () => {
-    console.warn('employee');
-    navigation.navigate('EmployeeSignIn');
-  };
 
   return (
     <View style={styles.root}>
@@ -66,14 +62,6 @@ const SigninScreen = () => {
 
       <CustomButton text="Sign In" onPress={onSignInPressed} />
       <View style={styles.sec}>
-        <View>
-          {/* <CustomButton
-            text="Login as bus employee?"
-            onPress={onBusEmployeePressed}
-            type="tertiary2"
-            
-          /> */}
-        </View>
         <View>
           <CustomButton
             text="Forgot Password?"
