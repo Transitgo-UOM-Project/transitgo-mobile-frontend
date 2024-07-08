@@ -5,51 +5,49 @@ import {
   StyleSheet,
   useWindowDimensions,
   ScrollView,
-} from "react-native";
-import React, { useState,useContext } from "react";
-import logo from "../../../assets/images/logo.png";
-import CustomInput from "../../components/CustomInput/Index";
-import CustomButton from "../../components/CustomButton/Index";
-import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "@/src/context/AuthContext";
-
+} from 'react-native';
+import React, {useState, useContext} from 'react';
+import logo from '../../../assets/images/logo.png';
+import CustomInput from '../../components/CustomInput/Index';
+import CustomButton from '../../components/CustomButton/Index';
+import {useNavigation} from '@react-navigation/native';
+import {AuthContext} from '@/src/context/AuthContext';
 
 const SigninScreen = () => {
   const {login} = useContext(AuthContext);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const { height } = useWindowDimensions();
+  const {height} = useWindowDimensions();
   const navigation = useNavigation();
 
-   const onSignInPressed = () => {
-     login(username, password);
-   };
+  const onSignInPressed = () => {
+    login(username, password);
+  };
 
   const onForgotPasswordPressed = () => {
-    console.warn("forgot password");
-    navigation.navigate('ConfirmEmail')
+    console.warn('forgot password');
+    navigation.navigate('ConfirmEmail');
   };
 
   const onSignInGoogle = () => {
-    console.warn("google");
+    console.warn('google');
     // navigation.navigate('HomeScreen')
-    
   };
   const onSignUpPressed = () => {
-    console.warn("SignUp");
-    navigation.navigate('SignUp')
+    console.warn('SignUp');
+    navigation.navigate('SignUp');
   };
   const onBusEmployeePressed = () => {
-    console.warn("employee");
-    navigation.navigate('EmployeeSignIn')
+    console.warn('employee');
+    navigation.navigate('EmployeeSignIn');
   };
 
   return (
     <View style={styles.root}>
       <Image
         source={logo}
-        style={[styles.logo, { height: height * 0.3 }]}
+        style={[styles.logo, {height: height * 0.3}]}
         resizeMode="contain"
       />
       <CustomInput
@@ -69,12 +67,12 @@ const SigninScreen = () => {
       <CustomButton text="Sign In" onPress={onSignInPressed} />
       <View style={styles.sec}>
         <View>
-          <CustomButton
+          {/* <CustomButton
             text="Login as bus employee?"
             onPress={onBusEmployeePressed}
             type="tertiary2"
             
-          />
+          /> */}
         </View>
         <View>
           <CustomButton
@@ -103,19 +101,19 @@ const SigninScreen = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     padding: 20,
   },
   logo: {
-    width: "70%",
+    width: '70%',
     maxWidth: 500,
     maxHeight: 300,
   },
 
   sec: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
 });
 
