@@ -44,7 +44,7 @@ const Lost = () => {
   const Submit = async () => {
     const postedOn = new Date().toISOString(); // Define postedOn with the current date and time
     const data = {
-      name,
+      name:name || null,
       bus_Description,
       mobile_Number: mobile_Number || null, // Set to null if not provided
       item_Description,
@@ -92,7 +92,7 @@ const Lost = () => {
           Item_Description,
         } = error.response.data;
         setErrorMsg(
-          `${Mobile_Number || Name || Bus_Description || Item_Description}`
+          `${Name ||Mobile_Number || Bus_Description || Item_Description}`
         );
       } else {
         // Other types of errors
@@ -109,7 +109,7 @@ const Lost = () => {
   return (
     <ScrollView style={styles.root}>
       <SafeAreaView>
-        <View style={styles.roo}>
+        <View style={styles.container}>
           <Text style={styles.Text}>Report Lost Items</Text>
           <CustomInput
             placeholder="Name"
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  roo: {
+  container: {
     flex: 1,
     alignItems: "center",
     padding: 20,
