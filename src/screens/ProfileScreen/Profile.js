@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert, ImageBackground,useWindowDimensions } from "react-native";
 import CustomInputProfile from "../../components/CustomInputProfile/Index";
 import CustomButton from "../../components/CustomButton/Index";
 import { useNavigation } from "@react-navigation/native";
@@ -11,6 +11,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 const apiURL = Config.API_BASE_URL;
 
 const Profile = () => {
+  const { height } = useWindowDimensions();
   const navigation = useNavigation();
   const [role, setRole] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -108,6 +109,22 @@ const Profile = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View>
+            <View style={styles.profile }>
+              <Text style={styles.proftex}></Text>
+              <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <ImageBackground
+                  source={require("../../../assets/images/profile.jpeg")}
+                  style={{ width: 50, height: 50 }}
+                  imageStyle={{
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: "white",
+                  }}
+                ></ImageBackground>
+              </TouchableOpacity>
+            </View>
+        </View>
       <View style={styles.form}>
         <Text style={styles.label}>First Name</Text>
         <CustomInputProfile
@@ -188,6 +205,16 @@ const styles = StyleSheet.create({
   },
   changePasswordText: {
     color: "red",
+  },
+  profile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 30,
+    marginTop: 20,
+  },
+  proftex: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 
