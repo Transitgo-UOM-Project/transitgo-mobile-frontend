@@ -1,22 +1,22 @@
-import React, { createContext, useState } from "react";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
-import { Alert } from "react-native";
-import { validateEmail, validatePassword } from "../components/Validations";
-import Config from "@/config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {createContext, useState} from 'react';
+import axios from 'axios';
+import {useNavigation} from '@react-navigation/native';
+import {Alert} from 'react-native';
+import {validateEmail, validatePassword} from '../components/Validations';
+import Config from '@/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const apiURL = Config.API_BASE_URL;
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({children}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userToken, setUserToken] = useState(null);
   const navigation = useNavigation();
   const [error, setError] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const login = async (username, password) => {
@@ -40,28 +40,28 @@ export const AuthProvider = ({ children }) => {
         {
           email: username,
           password: password,
-        }
+        },
       );
 
       console.log(response);
 
-      const { token, user } = response.data;
-      const { type, username: email, uname, id } = user;
+      const {token, user} = response.data;
+      const {type, username: email, uname, id} = user;
       const idStringyfied = JSON.stringify(id);
 
-      await AsyncStorage.setItem("token", token);
-      await AsyncStorage.setItem("role", type);
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("uname", uname);
-      await AsyncStorage.setItem("id", idStringyfied);
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('role', type);
+      await AsyncStorage.setItem('email', email);
+      await AsyncStorage.setItem('uname', uname);
+      await AsyncStorage.setItem('id', idStringyfied);
 
       setUserToken(token);
       setIsLoading(false);
     } catch (error) {
-      let errorMessage = "Something went wrong! Please try again later";
+      let errorMessage = 'Something went wrong! Please try again later';
       if (error.response && error.response.data) {
         errorMessage =
-          error.response.data.Message || "Invalid Email or Password";
+          error.response.data.Message || 'Invalid Email or Password';
       }
       setError({
         email: errorMessage,
@@ -77,23 +77,24 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem('token');
       const response = await fetch(`${apiURL}/api/v1/auth/logout`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
         await AsyncStorage.clear();
-        navigation.navigate("LoginScreen");
-        console.log("Logout success");
+
+        navigation.navigate('SignIn');
+        console.log('Logout success');
       } else {
-        console.log("Logout failed");
+        console.log('Logout failed');
       }
     } catch (error) {
-      console.error("Error during logout", error);
+      console.error('Error during logout', error);
     } finally {
       setUserToken(null);
       setIsLoading(false);
@@ -101,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ login, logout, isLoading, userToken }}>
+    <AuthContext.Provider value={{login, logout, isLoading, userToken}}>
       {children}
     </AuthContext.Provider>
   );
