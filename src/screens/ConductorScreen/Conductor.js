@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import BusTimeConductor from "../../components/BusTimeConductor/Index";
+import BusTimeOFF from "../../components/BusTimeOFF/Index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const apiUrl = Config.API_BASE_URL;
 
@@ -28,10 +29,15 @@ function Conductor() {
       try {
         const storedToken = await AsyncStorage.getItem("token");
         const storedId = await AsyncStorage.getItem("id");
-        setToken(storedToken);
-        setId(storedId);
+        if (storedToken && storedId) {
+          setToken(storedToken);
+          setId(storedId);
+        } else {
+          setError("No stored token or ID found.");
+        }
       } catch (error) {
         console.error("Failed to fetch user details:", error);
+        setError("Failed to fetch user details.");
       }
     };
 
@@ -44,6 +50,14 @@ function Conductor() {
       setError(null);
       console.log("iD isss ", id);
       try {
+        if (!id || !token) {
+          throw new Error("ID or Token is missing.");
+        }
+
+        const Authorization = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+
         const empBusResponse = await axios.get(
           `${apiUrl}/userBus/${id}`,
           Authorization
@@ -67,21 +81,107 @@ function Conductor() {
         setLoading(false);
       }
     };
-    loadBus();
-  }, [id]);
+    if (id && token) {
+      loadBus();
+    }
+  }, [id, token]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {loading && <ActivityIndicator size="large" color="#3182ce" />}
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {bus.regNo && bus.routeNo && bus.id && (
-        <BusTimeConductor
-          busID={bus.id}
-          busRegNo={bus.regNo}
-          routeNo={bus.routeNo}
-          direction={bus.status}
-        />
+      {bus.regNo && bus.routeNo && bus.id && bus.status !== "off" && (
+        <View
+          style={{
+            textAlign: "center",
+            marginTop: 30,
+            fontSize: 18,
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: 20,
+                color: "#071E60",
+                fontSize: 20,
+              }}
+            >
+              Start Your Journey
+            </Text>
+          </View>
+
+          <BusTimeConductor
+            busID={bus.id}
+            busRegNo={bus.regNo}
+            routeNo={bus.routeNo}
+            direction={bus.status}
+          />
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 20,
+              color: "red",
+              fontSize: 12,
+            }}
+          >
+            Note : Click Start Journey When the bus is starting to move from the
+            first bus stop to start the bus tracking. You can end the journey
+            after reaching the last stop by clicking end journey button.
+          </Text>
+        </View>
+      )}
+      {bus.status === "off" && (
+        <View
+          style={{
+            textAlign: "justify",
+            marginTop: 30,
+            fontSize: 18,
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: 20,
+                color: "#071E60",
+                fontSize: 20,
+              }}
+            >
+              Usual Bus Journey(s) For Today
+            </Text>
+          </View>
+          {bus.regNo && bus.routeNo && bus.id && (
+            <BusTimeOFF
+              busID={bus.id}
+              busRegNo={bus.regNo}
+              routeNo={bus.routeNo}
+              direction={"up"}
+            />
+          )}
+          {bus.regNo && bus.routeNo && bus.id && (
+            <BusTimeOFF
+              busID={bus.id}
+              busRegNo={bus.regNo}
+              routeNo={bus.routeNo}
+              direction={"down"}
+            />
+          )}
+
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 20,
+              color: "red",
+              fontSize: 12,
+            }}
+          >
+            Note : Your Bus is not within the time range to start a journey or
+            Today is a Off Day. Please come back around the start time of the
+            journey.
+          </Text>
+        </View>
       )}
     </ScrollView>
   );
