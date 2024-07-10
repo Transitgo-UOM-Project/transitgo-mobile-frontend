@@ -6,6 +6,12 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
+import { validateFname,
+  validateLname,
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  validateConfirmpassword } from "../../components/Validations";
 import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput/Index";
 import CustomButton from "../../components/CustomButton/Index";
@@ -89,9 +95,7 @@ const SignUpScreen = () => {
     }
   };
 
-  const onSignInGoogle = () => {
-    console.warn("google");
-  };
+  
   const onSignInPressed = () => {
     console.warn("Sign In");
     navigation.navigate("SignIn");
@@ -169,11 +173,6 @@ const SignUpScreen = () => {
             </Text>
           </Text>
 
-          <CustomButton
-            text="Sign in with Google"
-            onPress={onSignInGoogle}
-            type="special"
-          />
           <CustomButton
             text="Don't Have an account? Sign In"
             onPress={onSignInPressed}
