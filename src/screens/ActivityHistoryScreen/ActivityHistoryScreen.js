@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -177,6 +178,20 @@ const ActivityHistoryScreen = () => {
     <SafeAreaView>
       <ScrollView>
         <ScrollView style={styles.container}>
+           <View style={styles.profile }>
+              <Text style={styles.proftex}></Text>
+              <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <ImageBackground
+                  source={require("../../../assets/images/profile.jpeg")}
+                  style={{ width: 50, height: 50 }}
+                  imageStyle={{
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: "white",
+                  }}
+                ></ImageBackground>
+              </TouchableOpacity>
+            </View>
           <View style={styles.pad}>
             {activityLog.length > 0 ? (
               activityLog.map((activity) => (
@@ -316,6 +331,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: "2rem",
     opacity: "0.5",
+  },
+  profile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 30,
+    marginTop: 20,
+  },
+  proftex: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 
