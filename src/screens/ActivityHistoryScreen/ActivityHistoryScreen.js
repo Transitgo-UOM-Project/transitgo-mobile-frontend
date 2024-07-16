@@ -19,7 +19,6 @@ import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import CustomInputProfile from "@/src/components/CustomInputProfile/CustomInputProfile";
 
-
 const apiUrl = Config.API_BASE_URL;
 
 const ActivityHistoryScreen = () => {
@@ -174,28 +173,27 @@ const ActivityHistoryScreen = () => {
   };
 
   return (
-
     <SafeAreaView>
       <ScrollView>
         <ScrollView style={styles.container}>
-           <View style={styles.profile }>
-              <Text style={styles.proftex}></Text>
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <ImageBackground
-                  source={require("../../../assets/images/profile.jpeg")}
-                  style={{ width: 50, height: 50 }}
-                  imageStyle={{
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: "white",
-                  }}
-                ></ImageBackground>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.profile}>
+            <Text style={styles.proftex}></Text>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <ImageBackground
+                source={require("../../../assets/images/profile.jpeg")}
+                style={{ width: 50, height: 50 }}
+                imageStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: "white",
+                }}
+              ></ImageBackground>
+            </TouchableOpacity>
+          </View>
           <View style={styles.pad}>
             {activityLog.length > 0 ? (
               activityLog.map((activity) => (
-                <View key={activity.activityId} style={styles.itemContainer}>
+                <View key={activity.id} style={styles.itemContainer}>
                   <Text style={styles.label}>
                     {activity.activityType}
                     {activity.activityType === "Package" && (
@@ -268,7 +266,6 @@ const ActivityHistoryScreen = () => {
         </ScrollView>
       </ScrollView>
     </SafeAreaView>
-
   );
 };
 
