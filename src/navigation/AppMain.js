@@ -1,5 +1,5 @@
-import React, {useContext} from 'react';
-import {View, ActivityIndicator, StyleSheet} from 'react-native';
+import React, {useContext, useEffect} from 'react';
+import {View, ActivityIndicator, StyleSheet, Linking} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Draw from './Draw';
@@ -15,6 +15,7 @@ import SignUpScreen from '../screens/SignUpScreen/Index';
 import ActivityHistoryScreen from '../screens/ActivityHistoryScreen/Index';
 import HomeScreen from '../screens/HomeScreen/Index';
 import {createDrawerNavigator} from '@react-navigation/drawer';
+import EmailVerificationResultScreen from '../screens/EmailVerificationResult/Index';
 // Import other screens as needed
 
 const Stack = createNativeStackNavigator();
@@ -58,7 +59,7 @@ const AppMain = () => {
             <Stack.Screen name="ConfirmEmail" component={ConfirmEmailScreen} />
             <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
-
+            <Stack.Screen name="verify-email" component={EmailVerificationResultScreen} />
             {/* Add other screens as needed */}
           </>
         )}

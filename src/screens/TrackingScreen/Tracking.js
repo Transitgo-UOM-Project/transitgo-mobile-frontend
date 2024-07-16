@@ -1,15 +1,18 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, ImageBackground} from 'react-native';
 import React from 'react';
 import Header from '@/src/components/Header/Index';
 import CustomInput from '@/src/components/CustomInput/Index';
 import Config from '../../../config';
 import axios from 'axios';
 import CustomButton from '@/src/components/CustomButton/CustomButton';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
 
 const apiUrl = Config.API_BASE_URL;
 
 const Tracking = () => {
+  const navigation = useNavigation();
   const [packageID, setPackageID] = useState('');
   const [busID, setBusID] = useState(null);
   const [lastLeftStop, setLastLeftStop] = useState(null);
@@ -42,6 +45,20 @@ const Tracking = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.profile }>
+              <Text style={styles.proftex}></Text>
+              <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <ImageBackground
+                  source={require("../../../assets/images/profile.jpeg")}
+                  style={{ width: 50, height: 50 }}
+                  imageStyle={{
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: "white",
+                  }}
+                ></ImageBackground>
+              </TouchableOpacity>
+            </View>
       <View style={styles.content}>
         <Text style={styles.text}>Want to track your belonging?</Text>
         <Image
@@ -95,6 +112,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginVertical: 5,
     color: '#132968',
+  },
+  profile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 30,
+    marginTop: 20,
+  },
+  proftex: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 

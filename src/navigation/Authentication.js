@@ -33,10 +33,6 @@ const Authentication = () => {
         name="EmailVerification"
         component={EmailVerificationScreen}
       />
-      <Stack.Screen
-        name="verify-email"
-        component={EmailVerificationResultScreen}
-      />
       <Stack.Screen name="Success" component={SuccessComponent} />
       <Stack.Screen name="Fail" component={FailComponent} />
     </Stack.Navigator>

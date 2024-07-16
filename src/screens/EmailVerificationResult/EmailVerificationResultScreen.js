@@ -1,64 +1,58 @@
 import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    useWindowDimensions,
-    ScrollView,
-    SafeAreaView,
-    Alert,
-  } from "react-native";
-  import React, { useEffect, useState } from "react";
-  import { useNavigation, useRoute } from "@react-navigation/native";
-  import axios from "axios";
-  import Config from "@/config";
+  Alert,
+  useWindowDimensions,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
+import Config from "@/config";
 
-  const apiURL = Config.API_BASE_URL;
+const apiURL = Config.API_BASE_URL;
 
- 
-  const  EmailVerificationResultScreen= () => {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const [status, setStatus] = useState(null);
+const EmailVerificationResultScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [status, setStatus] = useState(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const token = route.params?.token;
-    if (!token){
-      Alert.alert("Error", "Email verification token not found!",[
-        {text: "Ok", onPress: () => navigation.navigate('SignUp')},
+    if (!token) {
+      Alert.alert("Error", "Email verification token not found!", [
+        { text: "Ok", onPress: () => navigation.navigate("SignUp") },
       ]);
       return;
     }
-    
+
     const verifyEmail = async () => {
-      try{
-        const response = await axios.get(`${apiURL}/api/v1/auth/verify-email`,{params: {token}});
-        const verificationStatus = response.data;
+      try {
+        console.log(`Verifying email with token: ${token}`);
+        const response = await axios.get(`${apiURL}/api/v1/auth/verify-email`, {
+          params: {token},
+        });
+        console.log(response);
+        const verificationStatus = response.data; // Adjust according to your API response
         setStatus(verificationStatus);
-      }catch(error){
-        console.log("Failed to verify email", error);
-        setStatus("Verify-Email");
+      } catch (error) {
+        console.log("Failed to verify email", error.response);
+        setStatus("Failed");
       }
     };
     verifyEmail();
-     
-   },[navigation, route.params?.token]);
+  }, [navigation, route.params?.token]);
 
-   useEffect(() => {
-    if (status){
-      if (status === "Verified"){
+  useEffect(() => {
+    if (status) {
+      if (status === "Verified") {
         navigation.navigate("Success");
-      }else{
+      } else {
         navigation.navigate("Fail");
       }
     }
-   },[status,navigation]);
-  
-    return null;
+  }, [status, navigation]);
 
-  };
-  
- 
-  
-  export default EmailVerificationResultScreen;
-  
+  return null;
+};
+
+export default EmailVerificationResultScreen;
