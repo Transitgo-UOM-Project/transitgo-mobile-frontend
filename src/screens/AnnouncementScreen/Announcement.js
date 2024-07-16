@@ -59,6 +59,7 @@ const Announcement = () => {
 
   const onbutPressed = async () => {
     if (ann === '') {
+      Alert.alert('input something');
       return;
     }
     try {

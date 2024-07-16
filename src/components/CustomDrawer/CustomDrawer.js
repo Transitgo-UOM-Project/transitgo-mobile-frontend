@@ -11,7 +11,7 @@ import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 
-const CustomDrawer = props => {
+const CustomDrawer = ({...props}) => {
   const {logout} = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -28,7 +28,7 @@ const CustomDrawer = props => {
   return (
     <View style={styles.container}>
       <DrawerContentScrollView
-        {...props}
+        // {...props}
         contentContainerStyle={{backgroundColor: '#FA6B6B'}}>
         <Image
           source={require('../../../assets/images/profile.jpeg')}

@@ -1,34 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert, ImageBackground,useWindowDimensions } from "react-native";
-import CustomInputProfile from "../../components/CustomInputProfile/Index";
-import CustomButton from "../../components/CustomButton/Index";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import Config from "@/config";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ImageBackground,
+  useWindowDimensions,
+} from 'react-native';
+import CustomInputProfile from '../../components/CustomInputProfile/Index';
+import CustomButton from '../../components/CustomButton/Index';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import Config from '@/config';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const apiURL = Config.API_BASE_URL;
 
 const Profile = () => {
-  const { height } = useWindowDimensions();
+  const {height} = useWindowDimensions();
   const navigation = useNavigation();
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const isPassenger = role === "passenger";
+  const isPassenger = role === 'passenger';
   const [profileInfo, setProfileInfo] = useState({
-    fname: "",
-    lname: "",
-    email: "",
-    uname: "",
-    id: "",
+    fname: '',
+    lname: '',
+    email: '',
+    uname: '',
+    id: '',
   });
   const [editData, setEditData] = useState({
-    fname: "",
-    lname: "",
-    uname: "",
-    email: "",
+    fname: '',
+    lname: '',
+    uname: '',
+    email: '',
   });
 
   const handleEdit = () => {
@@ -41,39 +49,39 @@ const Profile = () => {
     });
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async e => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem('token');
       const response = await axios.put(
         `${apiURL}/admin-user/update/${profileInfo.id}`,
         editData,
         {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+          headers: {Authorization: `Bearer ${token}`},
+        },
       );
-      console.warn("Saved");
-      Alert.alert("Changed Saved");
+      console.warn('Saved');
+      Alert.alert('Changed Saved');
 
       setProfileInfo(editData);
       setIsEditing(false);
     } catch (error) {
       console.warn(error);
-      Alert.alert("Error Updating profile");
+      Alert.alert('Error Updating profile');
     }
   };
 
   const handleDelete = () => {
-    navigation.navigate("VerifyPassword");
+    navigation.navigate('VerifyPassword');
   };
 
-  const getProfileInfo = async (e) => {
-    const token = await AsyncStorage.getItem("token");
-    const type = await AsyncStorage.getItem("role");
+  const getProfileInfo = async e => {
+    const token = await AsyncStorage.getItem('token');
+    const type = await AsyncStorage.getItem('role');
     setRole(type);
     console.log(type);
     try {
       const response = await axios.get(`${apiURL}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {Authorization: `Bearer ${token}`},
       });
       setProfileInfo({
         fname: response.data.fname,
@@ -83,12 +91,12 @@ const Profile = () => {
         id: response.data.id,
       });
     } catch (error) {
-      console.warn("Error fetching data");
+      console.warn('Error fetching data');
     }
   };
 
   const handlePasswordChange = () => {
-    navigation.navigate("ConfirmEmail");
+    navigation.navigate('ConfirmEmail');
   };
 
   useEffect(() => {
@@ -96,7 +104,7 @@ const Profile = () => {
   }, []);
 
   const onEditInput = (name, value) => {
-    setEditData({ ...editData, [name]: value });
+    setEditData({...editData, [name]: value});
   };
 
   const isSaveButtonVisible = () => {
@@ -110,28 +118,27 @@ const Profile = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View>
-            <View style={styles.profile }>
-              <Text style={styles.proftex}></Text>
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <ImageBackground
-                  source={require("../../../assets/images/profile.jpeg")}
-                  style={{ width: 50, height: 50 }}
-                  imageStyle={{
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: "white",
-                  }}
-                ></ImageBackground>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.profile}>
+          <Text style={styles.proftex}></Text>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <ImageBackground
+              source={require('../../../assets/images/profile.jpeg')}
+              style={{width: 50, height: 50}}
+              imageStyle={{
+                borderRadius: 24,
+                borderWidth: 1,
+                borderColor: 'white',
+              }}></ImageBackground>
+          </TouchableOpacity>
         </View>
+      </View>
       <View style={styles.form}>
         <Text style={styles.label}>First Name</Text>
         <CustomInputProfile
           placeholder="First Name"
           value={isEditing ? editData.fname : profileInfo.fname}
           editable={isEditing}
-          onChangeText={(text) => onEditInput("fname", text)}
+          onChangeText={text => onEditInput('fname', text)}
         />
 
         <Text style={styles.label}>Last Name</Text>
@@ -139,7 +146,7 @@ const Profile = () => {
           placeholder="Last Name"
           value={isEditing ? editData.lname : profileInfo.lname}
           editable={isEditing}
-          onChangeText={(text) => onEditInput("lname", text)}
+          onChangeText={text => onEditInput('lname', text)}
         />
 
         <Text style={styles.label}>E-mail</Text>
@@ -154,13 +161,12 @@ const Profile = () => {
           placeholder="User Name"
           value={isEditing ? editData.uname : profileInfo.uname}
           editable={isEditing}
-          onChangeText={(text) => onEditInput("uname", text)}
+          onChangeText={text => onEditInput('uname', text)}
         />
         {isEditing && (
           <TouchableOpacity
             onPress={handlePasswordChange}
-            style={styles.changePasswordContainer}
-          >
+            style={styles.changePasswordContainer}>
             <Text style={styles.changePasswordText}>Change Password</Text>
           </TouchableOpacity>
         )}
@@ -186,35 +192,36 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    backgroundColor: '#fff',
+    justifyContent: 'center',
   },
   form: {
-    width: "100%",
+    width: '100%',
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginVertical: 10,
   },
   buttonsContainer: {
     marginTop: 20,
   },
   changePasswordContainer: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
   },
   changePasswordText: {
-    color: "red",
+    color: 'red',
   },
   profile: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     marginTop: 20,
   },
   proftex: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

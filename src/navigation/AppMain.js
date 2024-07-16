@@ -19,7 +19,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
 
-const AppMain = () => {
+const AppMain = ({route}) => {
   const {isLoading, userToken} = useContext(AuthContext);
 
   if (isLoading) {
@@ -36,6 +36,7 @@ const AppMain = () => {
         {userToken !== null ? (
           <>
             <Stack.Screen name="Main" component={Draw} />
+
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="ConfirmEmail" component={ConfirmEmailScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />

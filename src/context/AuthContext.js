@@ -13,7 +13,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userToken, setUserToken] = useState(null);
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
   const [error, setError] = useState({
     email: '',
     password: '',
@@ -74,7 +74,7 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async navigation => {
     setIsLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
